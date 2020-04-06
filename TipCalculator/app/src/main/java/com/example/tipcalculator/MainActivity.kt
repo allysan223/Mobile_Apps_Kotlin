@@ -85,7 +85,11 @@ class MainActivity : AppCompatActivity() {
         b_tip_minus.setOnClickListener {
             // your code to perform when the user clicks on the button
             if(tipPercent > 0){
-                tipPercent--
+                if (tipPercent < 1){
+                    tipPercent = 0.0
+                } else {
+                    tipPercent --
+                }
                 et_tip_percent_val.setText("%.2f".format(tipPercent))
                 computeTip()
             }
