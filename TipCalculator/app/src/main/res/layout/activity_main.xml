@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
-        android:text="Enter Bill Amount"
+        android:text="Enter Bill/Tip Amount"
         android:textColor="#747789"
         android:textSize="30sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -63,7 +63,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
-        android:text="Enter Bill Amount"
+        android:text="Enter Bill/Tip Amount"
         android:textColor="#747789"
         android:textSize="30sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -138,5 +138,61 @@
         app:layout_constraintEnd_toStartOf="@+id/b_tip_minus"
         app:layout_constraintStart_toEndOf="@+id/b_tip_plus"
         app:layout_constraintTop_toBottomOf="@+id/tv_enter_tip_text" />
+
+    <Button
+        android:id="@+id/b_10_percent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="18dp"
+        android:layout_marginLeft="18dp"
+        android:layout_marginTop="16dp"
+        android:background="#306B99"
+        android:text="10%"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/b_tip_plus" />
+
+    <Button
+        android:id="@+id/b_20_percent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="16dp"
+        android:background="#306B99"
+        android:text="20%"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@+id/b_15_percent"
+        app:layout_constraintTop_toBottomOf="@+id/et_tip_percent_val" />
+
+    <Button
+        android:id="@+id/b_30_percent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="16dp"
+        android:background="#306B99"
+        android:text="30%"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@+id/b_20_percent"
+        app:layout_constraintTop_toBottomOf="@+id/et_tip_percent_val" />
+
+    <Button
+        android:id="@+id/b_15_percent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="16dp"
+        android:background="#306B99"
+        android:text="15%"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@+id/b_10_percent"
+        app:layout_constraintTop_toBottomOf="@+id/et_tip_percent_val" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

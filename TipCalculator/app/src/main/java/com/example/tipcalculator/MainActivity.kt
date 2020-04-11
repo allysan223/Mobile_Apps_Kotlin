@@ -94,13 +94,45 @@ class MainActivity : AppCompatActivity() {
                 computeTip()
             }
         }
+
+        // set on-click listener - when user clicks button
+        b_10_percent.setOnClickListener {
+            // your code to perform when the user clicks on the button
+            tipPercent = 10.0
+            et_tip_percent_val.setText("%.2f".format(tipPercent))
+            computeTip()
+        }
+
+        // set on-click listener - when user clicks button
+        b_15_percent.setOnClickListener {
+            // your code to perform when the user clicks on the button
+            tipPercent = 15.0
+            et_tip_percent_val.setText("%.2f".format(tipPercent))
+            computeTip()
+        }
+
+        // set on-click listener - when user clicks button
+        b_20_percent.setOnClickListener {
+            // your code to perform when the user clicks on the button
+            tipPercent = 20.0
+            et_tip_percent_val.setText("%.2f".format(tipPercent))
+            computeTip()
+        }
+
+        // set on-click listener - when user clicks button
+        b_30_percent.setOnClickListener {
+            // your code to perform when the user clicks on the button
+            tipPercent = 30.0
+            et_tip_percent_val.setText("%.2f".format(tipPercent))
+            computeTip()
+        }
     }
 
     private fun computeTip() {
         if (et_bill_amount_input.text.isEmpty() or et_tip_percent_val.text.isEmpty()){
             Log.i(TAG, "bill or tip empty")
-            tv_tip_amount_output.text = ""
-            tv_total_amount_output.text = ""
+            tv_tip_amount_output.text = "Enter Bill/Tip Amount"
+            tv_total_amount_output.text = "Enter Bill/Tip Amount"
             return
         }
 
