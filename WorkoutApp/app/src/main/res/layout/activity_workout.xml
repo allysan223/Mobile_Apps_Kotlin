@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tv_time_for"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Time For"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_workout_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Push Ups"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_time_for" />
+
+    <TextView
+        android:id="@+id/view_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="00"
+        android:textSize="80sp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_workout_text"
+        tools:targetApi="24"
+        tools:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/iv_lunges"
+        android:layout_width="404dp"
+        android:layout_height="342dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_timer"
+        app:srcCompat="@drawable/_main_reverselunge_0"
+        tools:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/iv_pushups"
+        android:layout_width="408dp"
+        android:layout_height="315dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_timer"
+        app:srcCompat="@drawable/pushups_pic"
+        tools:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/iv_squats"
+        android:layout_width="405dp"
+        android:layout_height="443dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_timer"
+        app:srcCompat="@drawable/squats_pic"
+        tools:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/iv_burpees"
+        android:layout_width="428dp"
+        android:layout_height="374dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_squats"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_timer"
+        app:srcCompat="@drawable/burpee1109"
+        tools:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/iv_planks"
+        android:layout_width="464dp"
+        android:layout_height="440dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/iv_squats"
+        app:srcCompat="@drawable/plank_pic"
+        tools:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/iv_crunches"
+        android:layout_width="464dp"
+        android:layout_height="303dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_timer"
+        app:srcCompat="@drawable/crunches_pic"
+        tools:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/iv_situp"
+        android:layout_width="477dp"
+        android:layout_height="417dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/iv_lunges"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_timer"
+        app:srcCompat="@drawable/situp_pic_2"
+        tools:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/iv_jumpingjacks"
+        android:layout_width="439dp"
+        android:layout_height="408dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_timer"
+        app:srcCompat="@drawable/jumping_jacks_main"
+        tools:visibility="invisible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
