@@ -15,7 +15,10 @@ import kotlinx.android.synthetic.main.activity_workout.*
 class WorkoutActivity : AppCompatActivity() {
 
     var seconds: Long = 0
-    val workoutDuration: Long = 30000
+    val workoutDuration: Long = 3000
+    var numWorkouts = 0
+    var workoutList = ArrayList<String>()
+    var i = 0
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,19 +28,18 @@ class WorkoutActivity : AppCompatActivity() {
 
         val bundle: Bundle? = intent.extras
         //val workoutList = bundle!!.getString("workout_list")
-        val workoutList = intent.getStringArrayListExtra("workout_list")
+        workoutList = intent.getStringArrayListExtra("workout_list")
 
         var timerRunning = true
         var countStarted = false
-        val numWorkouts = workoutList.count()
-        var i = 0
+        numWorkouts = workoutList.count()
 
         tv_workout_text.text = workoutList[i]
         show__workout_image(workoutList[i])
         Log.d("tag", "number of workouts" + numWorkouts.toString())
 
 
-
+        Log.d("tag", "starting timer for $workoutList[i]")
         object : CountDownTimer(workoutDuration, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 seconds = millisUntilFinished / 1000
@@ -49,8 +51,10 @@ class WorkoutActivity : AppCompatActivity() {
                 i++
                 Log.d("tag", "done!")
                 if (i < numWorkouts) {
+                    Log.d("tag", "workout " + i.toString() +"out of " + numWorkouts.toString())
                     startTimer(workoutList[i].toString())
                 } else {
+                    Log.d("tag", "done!")
                     view_timer.text = "DONE!"
                 }
             }
@@ -60,6 +64,7 @@ class WorkoutActivity : AppCompatActivity() {
 
 
     fun startTimer(workout: String) {
+        Log.d("tag", "starting timer for $workout")
         tv_workout_text.text = workout
         show__workout_image(workout)
         object : CountDownTimer(workoutDuration, 1000) {
@@ -70,8 +75,15 @@ class WorkoutActivity : AppCompatActivity() {
             }
 
             override fun onFinish() {
+                i++
                 Log.d("tag", "done!")
-                view_timer.text = "DONE!"
+                if (i < numWorkouts) {
+                    Log.d("tag", "workout " + i.toString() +"out of " + numWorkouts.toString())
+                    startTimer(workoutList[i])
+                } else {
+                    Log.d("tag", "done!")
+                    view_timer.text = "DONE!"
+                }
             }
         }.start()
     }
