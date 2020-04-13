@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.activity_workout.*
 class WorkoutActivity : AppCompatActivity() {
 
     var seconds: Long = 0
-    val workoutDuration: Long = 3000
+    val workoutDuration: Long = 10*1000 //in milliseconds
     var numWorkouts = 0
     var workoutList = ArrayList<String>()
     var i = 0
