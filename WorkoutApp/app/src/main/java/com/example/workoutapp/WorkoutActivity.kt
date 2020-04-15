@@ -55,29 +55,8 @@ class WorkoutActivity : AppCompatActivity() {
 
         Log.d("tag", "number of workouts" + numWorkouts.toString())
 
-
         //init timer for each workout, one after the other
-        Log.d("tag", "starting timer for $workoutList[i]")
-        object : CountDownTimer(workoutDuration, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                seconds = millisUntilFinished / 1000
-                Log.d("tag", "seconds remaining: " + seconds)
-                view_timer.text = seconds.toString()
-            }
-
-            override fun onFinish() {
-                index++
-                Log.d("tag", "done!")
-                if (index < numWorkouts) {
-                    Log.d("tag", "workout " + index.toString() +"out of " + numWorkouts.toString())
-                    //start next timer when done
-                    startTimer(workoutList[index].toString())
-                } else {
-                    Log.d("tag", "done!")
-                    view_timer.text = "DONE!"
-                }
-            }
-        }.start()
+        startTimer(workoutList[index])
 
         }
 

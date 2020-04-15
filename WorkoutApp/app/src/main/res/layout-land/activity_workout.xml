@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginLeft="32dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:text="00"
         android:textColor="#2196F3"
         android:textSize="80sp"
@@ -157,6 +157,7 @@
         android:layout_marginTop="32dp"
         android:text="Up Next:"
         android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_up_next_workout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view_timer" />
 
@@ -166,11 +167,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginLeft="32dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="24dp"
         android:text="Push Ups"
         android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_up_next" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
