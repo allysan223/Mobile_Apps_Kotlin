@@ -79,6 +79,12 @@ class WorkoutActivity : AppCompatActivity() {
     fun startTimer(workout: String) {
         Log.d("tag", "starting timer for $workout")
         tv_workout_text.text = workout
+        if (index < numWorkouts - 1){
+            tv_up_next_workout.text = workoutList[index+1]
+        } else {
+            tv_up_next_workout.text = "Last one!"
+        }
+
         show__workout_image(workout)
         object : CountDownTimer(workoutDuration, 1000) {
             override fun onTick(millisUntilFinished: Long) {

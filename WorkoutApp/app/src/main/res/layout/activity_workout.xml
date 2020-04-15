@@ -46,11 +46,11 @@
         android:id="@+id/iv_lunges"
         android:layout_width="404dp"
         android:layout_height="342dp"
+        android:layout_marginBottom="16dp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view_timer"
         app:srcCompat="@drawable/_main_reverselunge_0"
         tools:visibility="invisible" />
 
@@ -58,23 +58,23 @@
         android:id="@+id/iv_pushups"
         android:layout_width="408dp"
         android:layout_height="315dp"
+        android:layout_marginBottom="16dp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view_timer"
         app:srcCompat="@drawable/pushups_pic"
         tools:visibility="invisible" />
 
     <ImageView
         android:id="@+id/iv_squats"
-        android:layout_width="405dp"
-        android:layout_height="443dp"
+        android:layout_width="408dp"
+        android:layout_height="391dp"
+        android:layout_marginBottom="16dp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view_timer"
         app:srcCompat="@drawable/squats_pic"
         tools:visibility="invisible" />
 
@@ -82,11 +82,11 @@
         android:id="@+id/iv_burpees"
         android:layout_width="428dp"
         android:layout_height="374dp"
+        android:layout_marginBottom="16dp"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/iv_squats"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view_timer"
         app:srcCompat="@drawable/burpee1109"
         tools:visibility="invisible" />
 
@@ -94,11 +94,11 @@
         android:id="@+id/iv_planks"
         android:layout_width="464dp"
         android:layout_height="440dp"
+        android:layout_marginBottom="16dp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/iv_squats"
         app:srcCompat="@drawable/plank_pic"
         tools:visibility="invisible" />
 
@@ -106,10 +106,10 @@
         android:id="@+id/iv_crunches"
         android:layout_width="464dp"
         android:layout_height="303dp"
+        android:layout_marginBottom="16dp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view_timer"
         app:srcCompat="@drawable/crunches_pic"
         tools:visibility="invisible" />
 
@@ -117,11 +117,11 @@
         android:id="@+id/iv_situp"
         android:layout_width="477dp"
         android:layout_height="417dp"
+        android:layout_marginBottom="16dp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/iv_lunges"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view_timer"
         app:srcCompat="@drawable/situp_pic_2"
         tools:visibility="invisible" />
 
@@ -129,13 +129,36 @@
         android:id="@+id/iv_jumpingjacks"
         android:layout_width="439dp"
         android:layout_height="408dp"
+        android:layout_marginBottom="16dp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view_timer"
         app:srcCompat="@drawable/jumping_jacks_main"
         tools:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/tv_up_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="120dp"
+        android:layout_marginRight="120dp"
+        android:text="Up Next:"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_timer" />
+
+    <TextView
+        android:id="@+id/tv_up_next_workout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:text="Push Ups"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@+id/tv_up_next"
+        app:layout_constraintTop_toBottomOf="@+id/view_timer" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
