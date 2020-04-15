@@ -41,10 +41,12 @@
 
     <Button
         android:id="@+id/b_start_workout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="128dp"
+        android:layout_height="44dp"
         android:layout_marginBottom="32dp"
+        android:background="#2196F3"
         android:text="Start workout"
+        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -57,6 +59,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginTop="16dp"
         android:text="Select exercises:"
+        android:textColor="#2196F3"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -115,5 +118,30 @@
         android:text="Planks"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cb_workout4" />
+
+    <EditText
+        android:id="@+id/et_workout_seconds"
+        android:layout_width="63dp"
+        android:layout_height="49dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="60"
+        android:inputType="number"
+        android:textSize="24sp"
+        app:layout_constraintStart_toEndOf="@+id/textView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_workout_seconds"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Seconds"
+        android:textColor="#2196F3"
+        android:textSize="24sp"
+        app:layout_constraintStart_toEndOf="@+id/et_workout_seconds"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

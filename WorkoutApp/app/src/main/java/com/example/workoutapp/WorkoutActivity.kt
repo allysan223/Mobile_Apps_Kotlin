@@ -1,5 +1,6 @@
 package com.example.workoutapp
 
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -15,27 +16,34 @@ import kotlinx.android.synthetic.main.activity_workout.*
 class WorkoutActivity : AppCompatActivity() {
 
     var seconds: Long = 0
-    val workoutDuration: Long = 10*1000 //in milliseconds
+    var workoutDuration: Long = 10*1000 //in milliseconds
     var numWorkouts = 0
     var workoutList = ArrayList<String>()
-    var i = 0
+    var index = 0
 
     @RequiresApi(Build.VERSION_CODES.N)
+//    override fun onConfigurationChanged(newConfig: Configuration) {
+//        super.onConfigurationChanged(newConfig)
+//        setContentView(R.layout.activity_workout)
+//        Log.d("tag","config changed - activity workout")
+//    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_workout)
+        Log.d("tag","on create - activity workout")
         Log.d("tag", "Workout Activity started.")
 
         val bundle: Bundle? = intent.extras
         //val workoutList = bundle!!.getString("workout_list")
         workoutList = intent.getStringArrayListExtra("workout_list")
+        workoutDuration = intent.getIntExtra("seconds", 10).toLong() * 1000
 
         var timerRunning = true
         var countStarted = false
         numWorkouts = workoutList.count()
 
-        tv_workout_text.text = workoutList[i]
-        show__workout_image(workoutList[i])
+        tv_workout_text.text = workoutList[index]
+        show__workout_image(workoutList[index])
         Log.d("tag", "number of workouts" + numWorkouts.toString())
 
 
@@ -48,11 +56,11 @@ class WorkoutActivity : AppCompatActivity() {
             }
 
             override fun onFinish() {
-                i++
+                index++
                 Log.d("tag", "done!")
-                if (i < numWorkouts) {
-                    Log.d("tag", "workout " + i.toString() +"out of " + numWorkouts.toString())
-                    startTimer(workoutList[i].toString())
+                if (index < numWorkouts) {
+                    Log.d("tag", "workout " + index.toString() +"out of " + numWorkouts.toString())
+                    startTimer(workoutList[index].toString())
                 } else {
                     Log.d("tag", "done!")
                     view_timer.text = "DONE!"
@@ -75,11 +83,11 @@ class WorkoutActivity : AppCompatActivity() {
             }
 
             override fun onFinish() {
-                i++
+                index++
                 Log.d("tag", "done!")
-                if (i < numWorkouts) {
-                    Log.d("tag", "workout " + i.toString() +"out of " + numWorkouts.toString())
-                    startTimer(workoutList[i])
+                if (index < numWorkouts) {
+                    Log.d("tag", "workout " + index.toString() +"out of " + numWorkouts.toString())
+                    startTimer(workoutList[index])
                 } else {
                     Log.d("tag", "done!")
                     view_timer.text = "DONE!"
