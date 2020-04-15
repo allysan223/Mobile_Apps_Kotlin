@@ -7,6 +7,7 @@ import android.os.CountDownTimer
 import android.os.Handler
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -29,24 +30,27 @@ class WorkoutActivity : AppCompatActivity() {
 //    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //keep screen from sleeping
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_workout)
         Log.d("tag","on create - activity workout")
         Log.d("tag", "Workout Activity started.")
 
+        //extract intents - data from first (main) activity
         val bundle: Bundle? = intent.extras
-        //val workoutList = bundle!!.getString("workout_list")
         workoutList = intent.getStringArrayListExtra("workout_list")
         workoutDuration = intent.getIntExtra("seconds", 10).toLong() * 1000
 
+        //init variables
         var timerRunning = true
         var countStarted = false
         numWorkouts = workoutList.count()
-
         tv_workout_text.text = workoutList[index]
         show__workout_image(workoutList[index])
         Log.d("tag", "number of workouts" + numWorkouts.toString())
 
 
+        //init timer for each workout, one after the other
         Log.d("tag", "starting timer for $workoutList[i]")
         object : CountDownTimer(workoutDuration, 1000) {
             override fun onTick(millisUntilFinished: Long) {
@@ -60,6 +64,7 @@ class WorkoutActivity : AppCompatActivity() {
                 Log.d("tag", "done!")
                 if (index < numWorkouts) {
                     Log.d("tag", "workout " + index.toString() +"out of " + numWorkouts.toString())
+                    //start next timer when done
                     startTimer(workoutList[index].toString())
                 } else {
                     Log.d("tag", "done!")
