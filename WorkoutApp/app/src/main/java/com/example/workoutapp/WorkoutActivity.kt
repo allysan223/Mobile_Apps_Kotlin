@@ -47,6 +47,12 @@ class WorkoutActivity : AppCompatActivity() {
         numWorkouts = workoutList.count()
         tv_workout_text.text = workoutList[index]
         show__workout_image(workoutList[index])
+        if (index < numWorkouts - 1){
+            tv_up_next_workout.text = workoutList[index+1]
+        } else {
+            tv_up_next_workout.text = "Last one!"
+        }
+
         Log.d("tag", "number of workouts" + numWorkouts.toString())
 
 
