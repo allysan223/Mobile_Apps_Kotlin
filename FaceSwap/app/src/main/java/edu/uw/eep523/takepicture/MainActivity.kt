@@ -171,6 +171,17 @@ class MainActivity : AppCompatActivity() {
          startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_CHOOSE_IMAGE)
     }
 
+    fun ClearDrawView(view:View) {
+        if (view.getId() == R.id.b_clearPic_1){
+            currentPane = 1
+            drawViewPic1?.clearCanvas()
+
+        } else if (view.getId() == R.id.b_clearPic_2) {
+            currentPane = 2
+            drawViewPic2?.clearCanvas()
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
