@@ -39,17 +39,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
-    <Button
+    <ImageButton
         android:id="@+id/b_start_workout"
-        android:layout_width="125dp"
-        android:layout_height="49dp"
+        android:layout_width="86dp"
+        android:layout_height="41dp"
         android:layout_marginBottom="32dp"
         android:background="#2196F3"
-        android:text="Start workout"
-        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@android:drawable/ic_media_play" />
 
     <TextView
         android:id="@+id/textView"

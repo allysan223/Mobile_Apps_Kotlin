@@ -29,6 +29,7 @@ class WorkoutActivity : AppCompatActivity() {
 //        Log.d("tag","config changed - activity workout")
 //    }
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         //keep screen from sleeping
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -58,7 +59,8 @@ class WorkoutActivity : AppCompatActivity() {
         //init timer for each workout, one after the other
         startTimer(workoutList[index])
 
-        }
+    }
+
 
 
     fun startTimer(workout: String) {
