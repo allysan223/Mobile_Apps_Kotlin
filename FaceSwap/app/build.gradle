@@ -38,4 +38,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     // AndroidDraw Library
     implementation 'com.github.divyanshub024:AndroidDraw:v0.1'
+    //FireBase ML Kit - Face detection
+    implementation 'com.google.firebase:firebase-ml-vision:24.0.2'
+    implementation 'com.google.firebase:firebase-ml-vision-face-model:20.0.0'
 }

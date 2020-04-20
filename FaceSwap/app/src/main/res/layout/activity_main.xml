@@ -12,6 +12,18 @@ it must specify the Android Resource XML namespace at http://schemas.android.com
     android:orientation="vertical">
 
 
+    <Button
+        android:id="@+id/b_blurPic_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:onClick="blurView"
+        android:text="Blur"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/b_clearPic_1"
+        app:layout_constraintTop_toTopOf="@+id/b_selectPic_1" />
+
     <com.divyanshu.draw.widget.DrawView
         android:id="@+id/previewPane_1"
         android:layout_width="208dp"
@@ -56,7 +68,7 @@ it must specify the Android Resource XML namespace at http://schemas.android.com
         android:layout_gravity="left"
         android:onClick="ClearDrawView"
         android:text="Clear"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/b_blurPic_1"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/b_takePic_1"
         app:layout_constraintTop_toTopOf="@+id/b_selectPic_1" />
