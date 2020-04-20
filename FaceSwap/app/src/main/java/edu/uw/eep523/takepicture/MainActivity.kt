@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.ImageDecoder
 import android.graphics.drawable.BitmapDrawable
@@ -15,13 +16,13 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import com.divyanshu.draw.widget.DrawView
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.divyanshu.draw.widget.DrawView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.IOException
 import java.util.*
@@ -34,6 +35,10 @@ class MainActivity : AppCompatActivity() {
     private var currentPane = 1
     private var drawViewPic1: DrawView? = null
     private var drawViewPic2: DrawView? = null
+    private var imageBitmap1: Bitmap? = null
+    private var imageBitmap2: Bitmap? = null
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +67,7 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        // Setup draw view for previewPane 1
+        // Setup draw view for previewPane 2
         drawViewPic2 = findViewById(R.id.previewPane_2)
         drawViewPic2?.setStrokeWidth(10.0f)
         drawViewPic2?.setColor(Color.WHITE)
@@ -182,6 +187,42 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+            tryReloadAndDetectInImage()
+        } else if (requestCode == REQUEST_CHOOSE_IMAGE && resultCode == Activity.RESULT_OK) {
+            // In this case, imageUri is returned by the chooser, save it.
+            imageUri = data!!.data
+            tryReloadAndDetectInImage()
+        }
+    }
+
+    private fun tryReloadAndDetectInImage() {
+        try {
+            if (imageUri == null) {
+                return
+            }
+            val imageBitmap = if (Build.VERSION.SDK_INT < 29) {
+                MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
+            } else {
+                val source = ImageDecoder.createSource(contentResolver, imageUri!!)
+                ImageDecoder.decodeBitmap(source)
+            }
+            val d: Drawable = BitmapDrawable(resources, imageBitmap)
+            if (currentPane == 1){
+                imageBitmap1 = imageBitmap
+                previewPane_1?.background = d //previewPane is the ImageView from the layout
+            } else if (currentPane == 2){
+                imageBitmap2 = imageBitmap
+                previewPane_2?.background = d //previewPane is the ImageView from the layout
+
+            }
+        } catch (e: IOException) {
+        }
+    }
+
     fun blurView(view:View) {
         val scaleFactor = 20
         var imageBitmap = if (Build.VERSION.SDK_INT < 29) {
@@ -190,14 +231,32 @@ class MainActivity : AppCompatActivity() {
             val source = ImageDecoder.createSource(contentResolver, imageUri!!)
             ImageDecoder.decodeBitmap(source)
         }
+
+        when (view.getId()) {
+            R.id.b_blurPic_1 -> imageBitmap = imageBitmap1
+            R.id.b_blurPic_2 -> imageBitmap = imageBitmap2
+            else -> {
+                null
+            }
+        }
+
         val resizedBitmap = Bitmap.createScaledBitmap(
             imageBitmap,
             (imageBitmap.width / scaleFactor),
             (imageBitmap.height / scaleFactor),
             true)
+
         imageBitmap = bitmapBlur(resizedBitmap, 1.0f, 3)
         val d: Drawable = BitmapDrawable(resources, imageBitmap)
-        previewPane_2?.background = d //previewPane is the ImageView from the layout
+        if ( view.getId() == R.id.b_blurPic_1){
+            imageBitmap1 = imageBitmap
+            previewPane_1?.background = d //previewPane is the ImageView from the layout
+
+        } else if (view.getId() == R.id.b_blurPic_2) {
+            imageBitmap2 = imageBitmap
+            previewPane_2?.background = d //previewPane is the ImageView from the layout
+        }
+
 
     }
 
@@ -451,38 +510,6 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            tryReloadAndDetectInImage()
-        } else if (requestCode == REQUEST_CHOOSE_IMAGE && resultCode == Activity.RESULT_OK) {
-            // In this case, imageUri is returned by the chooser, save it.
-            imageUri = data!!.data
-            tryReloadAndDetectInImage()
-        }
-    }
-
-    private fun tryReloadAndDetectInImage() {
-        try {
-            if (imageUri == null) {
-                return
-            }
-            val imageBitmap = if (Build.VERSION.SDK_INT < 29) {
-                MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
-            } else {
-                val source = ImageDecoder.createSource(contentResolver, imageUri!!)
-                ImageDecoder.decodeBitmap(source)
-            }
-            val d: Drawable = BitmapDrawable(resources, imageBitmap)
-            if (currentPane == 1){
-                previewPane_1?.background = d //previewPane is the ImageView from the layout
-            } else if (currentPane == 2){
-                previewPane_2?.background = d //previewPane is the ImageView from the layout
-
-            }
-        } catch (e: IOException) {
-        }
-    }
 
 
     companion object {

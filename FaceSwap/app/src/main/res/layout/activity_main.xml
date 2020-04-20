@@ -118,9 +118,21 @@ it must specify the Android Resource XML namespace at http://schemas.android.com
         android:layout_gravity="left"
         android:onClick="ClearDrawView"
         android:text="Clear"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/b_blurPic_2"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/b_takePic_2"
+        app:layout_constraintTop_toTopOf="@+id/b_selectPic_2" />
+
+    <Button
+        android:id="@+id/b_blurPic_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:onClick="blurView"
+        android:text="Blur"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/b_clearPic_2"
         app:layout_constraintTop_toTopOf="@+id/b_selectPic_2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
