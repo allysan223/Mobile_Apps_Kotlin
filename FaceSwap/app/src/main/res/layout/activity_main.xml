@@ -26,9 +26,10 @@ it must specify the Android Resource XML namespace at http://schemas.android.com
 
     <com.divyanshu.draw.widget.DrawView
         android:id="@+id/previewPane_1"
-        android:layout_width="208dp"
-        android:layout_height="256dp"
+        android:layout_width="207dp"
+        android:layout_height="250dp"
         android:layout_alignParentTop="true"
+        android:layout_marginTop="16dp"
         android:scaleType="fitStart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -53,7 +54,7 @@ it must specify the Android Resource XML namespace at http://schemas.android.com
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="left"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:onClick="startChooseImageIntentForResult"
         android:text="Select photo"
         app:layout_constraintEnd_toStartOf="@+id/b_takePic_1"
@@ -75,14 +76,14 @@ it must specify the Android Resource XML namespace at http://schemas.android.com
 
     <com.divyanshu.draw.widget.DrawView
         android:id="@+id/previewPane_2"
-        android:layout_width="208dp"
-        android:layout_height="256dp"
+        android:layout_width="207dp"
+        android:layout_height="250dp"
         android:layout_alignParentTop="true"
         android:scaleType="fitStart"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/b_selectPic_1"/>
+        app:layout_constraintTop_toBottomOf="@+id/b_selectPic_1" />
 
     <Button
         android:id="@+id/b_takePic_2"
@@ -134,5 +135,16 @@ it must specify the Android Resource XML namespace at http://schemas.android.com
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/b_clearPic_2"
         app:layout_constraintTop_toTopOf="@+id/b_selectPic_2" />
+
+    <Button
+        android:id="@+id/b_faceSwap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="FaceSwap"
+        android:text="Face Swap!"
+        app:layout_constraintBottom_toTopOf="@+id/previewPane_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/b_takePic_1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

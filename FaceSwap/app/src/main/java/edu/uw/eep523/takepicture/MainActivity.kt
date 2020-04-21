@@ -19,13 +19,21 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.divyanshu.draw.widget.DrawView
+import com.google.firebase.FirebaseApp
+import com.google.firebase.ml.vision.FirebaseVision
+import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.firebase.ml.vision.face.FirebaseVisionFace
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.IOException
 import java.util.*
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -38,9 +46,17 @@ class MainActivity : AppCompatActivity() {
     private var imageBitmap1: Bitmap? = null
     private var imageBitmap2: Bitmap? = null
 
+    val options = FirebaseVisionFaceDetectorOptions.Builder()
+        .setClassificationMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
+        .setLandmarkMode(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS)
+        .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
+        .setMinFaceSize(0.15f)
+        .build()
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
@@ -78,6 +94,9 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
+
+        FirebaseApp.initializeApp(this);
+
     }
 
     private fun getRequiredPermissions(): Array<String?> {
@@ -185,6 +204,84 @@ class MainActivity : AppCompatActivity() {
             currentPane = 2
             drawViewPic2?.clearCanvas()
         }
+    }
+
+    private fun processFaceResult( result: List<FirebaseVisionFace>) {
+        var count = 0;
+        for (face in result) {
+            val bounds = face.boundingBox
+            count++
+        }
+        Log.d("DEBUG", "number of faces is $count")
+
+
+    }
+
+    fun FaceSwap(view:View) {
+//        imageBitmap1 = imageBitmap1?.let {
+//            Bitmap.createScaledBitmap(
+//                it,
+//                (imageBitmap1!!.width / 5),
+//                (imageBitmap1!!.height / 5),
+//                true)
+//        }
+
+        val width = imageBitmap1?.width
+        val height = imageBitmap1?.height
+        Log.d("DEBUG","hieght = $height, width = $width")
+        imageBitmap1 = imageBitmap1?.copy(Bitmap.Config.ARGB_8888,true);
+        Log.d("DEBUG","config = $imageBitmap1.Config")
+
+        val face1 = FirebaseVisionImage.fromBitmap(imageBitmap1!!)
+        //val face2 = FirebaseVisionImage.fromBitmap(imageBitmap2!!)
+
+        val detector = FirebaseVision.getInstance()
+            .getVisionFaceDetector(options)
+
+
+        val result = detector.detectInImage(face1)
+            .addOnSuccessListener { faces ->
+                // Task completed successfully
+                // [START_EXCLUDE]
+                // [START get_face_info]
+                for (face in faces) {
+                    val bounds = face.boundingBox
+                    val rotY = face.headEulerAngleY // Head is rotated to the right rotY degrees
+                    val rotZ = face.headEulerAngleZ // Head is tilted sideways rotZ degrees
+
+                    // If landmark detection was enabled (mouth, ears, eyes, cheeks, and
+                    // nose available):
+                    val leftEar = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EAR)
+                    leftEar?.let {
+                        val leftEarPos = leftEar.position
+                    }
+
+                    // If classification was enabled:
+                    if (face.smilingProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY) {
+                        val smileProb = face.smilingProbability
+                        Log.d("DEBUG","smile prob = " + smileProb)
+                    }
+                    if (face.rightEyeOpenProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY) {
+                        val rightEyeOpenProb = face.rightEyeOpenProbability
+                    }
+
+                    // If face tracking was enabled:
+                    if (face.trackingId != FirebaseVisionFace.INVALID_ID) {
+                        val id = face.trackingId
+                    }
+
+
+
+                }
+                // [END get_face_info]
+                // [END_EXCLUDE]
+            }
+            .addOnFailureListener{ e ->
+                Toast.makeText (this, e.message, Toast.LENGTH_SHORT).show()
+                Log.e("DEBUG", "Failed: ${e.message}")
+                e.printStackTrace()
+            }
+
     }
 
 
