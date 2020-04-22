@@ -187,7 +187,7 @@ class MainActivity : AppCompatActivity() {
          if (view.getId() == R.id.b_selectPic_1){
              currentPane = 1
          } else if (view.getId() == R.id.b_selectPic_2) {
-             currentPane =2
+             currentPane = 2
          }
          val intent = Intent()
          intent.type = "image/*"
@@ -199,10 +199,14 @@ class MainActivity : AppCompatActivity() {
         if (view.getId() == R.id.b_clearPic_1){
             currentPane = 1
             drawViewPic1?.clearCanvas()
+            val d: Drawable = BitmapDrawable(resources, imageBitmap1)
+            previewPane_1?.background = d
 
         } else if (view.getId() == R.id.b_clearPic_2) {
             currentPane = 2
             drawViewPic2?.clearCanvas()
+            val d: Drawable = BitmapDrawable(resources, imageBitmap2)
+            previewPane_2?.background = d
         }
     }
 
@@ -217,35 +221,27 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun FaceSwap(view:View) {
-//        imageBitmap1 = imageBitmap1?.let {
-//            Bitmap.createScaledBitmap(
-//                it,
-//                (imageBitmap1!!.width / 5),
-//                (imageBitmap1!!.height / 5),
-//                true)
-//        }
+    fun detectSmile(bitmap: Bitmap) {
+        var bitmap = bitmap?.copy(Bitmap.Config.ARGB_8888,true);
+        Log.d("DEBUG","config = $bitmap.Config")
 
-        val width = imageBitmap1?.width
-        val height = imageBitmap1?.height
-        Log.d("DEBUG","hieght = $height, width = $width")
-        imageBitmap1 = imageBitmap1?.copy(Bitmap.Config.ARGB_8888,true);
-        Log.d("DEBUG","config = $imageBitmap1.Config")
+        bitmap = bitmap?.let { rescaleImage(it) }
 
-        val face1 = FirebaseVisionImage.fromBitmap(imageBitmap1!!)
+        val faceImage = FirebaseVisionImage.fromBitmap(bitmap!!)
         //val face2 = FirebaseVisionImage.fromBitmap(imageBitmap2!!)
 
         val detector = FirebaseVision.getInstance()
             .getVisionFaceDetector(options)
 
 
-        val result = detector.detectInImage(face1)
+        val result = detector.detectInImage(faceImage)
             .addOnSuccessListener { faces ->
                 // Task completed successfully
                 // [START_EXCLUDE]
                 // [START get_face_info]
                 for (face in faces) {
                     val bounds = face.boundingBox
+                    Log.d("DEBUG","bounds = $bounds")
                     val rotY = face.headEulerAngleY // Head is rotated to the right rotY degrees
                     val rotZ = face.headEulerAngleZ // Head is tilted sideways rotZ degrees
 
@@ -263,6 +259,98 @@ class MainActivity : AppCompatActivity() {
                     }
                     if (face.rightEyeOpenProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY) {
                         val rightEyeOpenProb = face.rightEyeOpenProbability
+                        val leftEyeOpenProb = face.leftEyeOpenProbability
+                        Log.d("DEBUG","eyes prob, right eye = $rightEyeOpenProb, left eye = $leftEyeOpenProb")
+                        if (rightEyeOpenProb < .70 && leftEyeOpenProb < .70){
+                            Toast.makeText (this, "Are your eyes open? Take another pic!", Toast.LENGTH_SHORT).show()
+                        }
+
+                    }
+
+                    // If face tracking was enabled:
+                    if (face.trackingId != FirebaseVisionFace.INVALID_ID) {
+                        val id = face.trackingId
+                    }
+
+
+
+                }
+                // [END get_face_info]
+                // [END_EXCLUDE]
+            }
+            .addOnFailureListener{ e ->
+                Toast.makeText (this, e.message, Toast.LENGTH_SHORT).show()
+                Log.e("DEBUG", "Failed: ${e.message}")
+                e.printStackTrace()
+            }
+
+    }
+
+    fun rescaleImage(scaleImage: Bitmap): Bitmap {
+        var scaleImage = scaleImage
+
+        val width = scaleImage?.width
+        val height = scaleImage?.height
+        Log.d("DEBUG","hieght = $height, width = $width")
+
+        if (width != null && height != null) {
+            if (width > 1000 && height > 1000){
+                scaleImage = scaleImage?.let {
+                    Bitmap.createScaledBitmap(
+                        it,
+                        (scaleImage!!.width / 3),
+                        (scaleImage!!.height / 3),
+                        true)
+                }
+            }
+        }
+        return scaleImage
+    }
+
+    fun FaceSwap(view:View) {
+        imageBitmap1 = imageBitmap1?.let { rescaleImage(it) }
+
+        imageBitmap1 = imageBitmap1?.copy(Bitmap.Config.ARGB_8888,true);
+        Log.d("DEBUG","config = $imageBitmap1.Config")
+
+        val face1 = FirebaseVisionImage.fromBitmap(imageBitmap1!!)
+        //val face2 = FirebaseVisionImage.fromBitmap(imageBitmap2!!)
+
+        val detector = FirebaseVision.getInstance()
+            .getVisionFaceDetector(options)
+
+
+        val result = detector.detectInImage(face1)
+            .addOnSuccessListener { faces ->
+                // Task completed successfully
+                // [START_EXCLUDE]
+                // [START get_face_info]
+                for (face in faces) {
+                    val bounds = face.boundingBox
+                    Log.d("DEBUG","bounds = $bounds")
+                    val rotY = face.headEulerAngleY // Head is rotated to the right rotY degrees
+                    val rotZ = face.headEulerAngleZ // Head is tilted sideways rotZ degrees
+
+                    // If landmark detection was enabled (mouth, ears, eyes, cheeks, and
+                    // nose available):
+                    val leftEar = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EAR)
+                    leftEar?.let {
+                        val leftEarPos = leftEar.position
+                    }
+
+                    // If classification was enabled:
+                    if (face.smilingProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY) {
+                        val smileProb = face.smilingProbability
+                        Log.d("DEBUG","smile prob = " + smileProb)
+                    }
+                    if (face.rightEyeOpenProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY) {
+                        val rightEyeOpenProb = face.rightEyeOpenProbability
+                        val leftEyeOpenProb = face.leftEyeOpenProbability
+                        Log.d("DEBUG","eyes prob, right eye = $rightEyeOpenProb, left eye = $leftEyeOpenProb")
+                        if (rightEyeOpenProb < 70 && leftEyeOpenProb < 70){
+                            Toast.makeText (this, "Are your eyes open? Take another pic!", Toast.LENGTH_SHORT).show()
+                        }
+
                     }
 
                     // If face tracking was enabled:
@@ -307,6 +395,7 @@ class MainActivity : AppCompatActivity() {
                 val source = ImageDecoder.createSource(contentResolver, imageUri!!)
                 ImageDecoder.decodeBitmap(source)
             }
+            detectSmile(imageBitmap)
             val d: Drawable = BitmapDrawable(resources, imageBitmap)
             if (currentPane == 1){
                 imageBitmap1 = imageBitmap
@@ -346,11 +435,9 @@ class MainActivity : AppCompatActivity() {
         imageBitmap = bitmapBlur(resizedBitmap, 1.0f, 3)
         val d: Drawable = BitmapDrawable(resources, imageBitmap)
         if ( view.getId() == R.id.b_blurPic_1){
-            imageBitmap1 = imageBitmap
             previewPane_1?.background = d //previewPane is the ImageView from the layout
 
         } else if (view.getId() == R.id.b_blurPic_2) {
-            imageBitmap2 = imageBitmap
             previewPane_2?.background = d //previewPane is the ImageView from the layout
         }
 
