@@ -6,10 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.graphics.ImageDecoder
+import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -197,12 +194,20 @@ class MainActivity : AppCompatActivity() {
 
     fun ClearDrawView(view:View) {
         if (view.getId() == R.id.b_clearPic_1){
+            if ( imageBitmap1 == null ){
+                Toast.makeText (this, "Select an image!", Toast.LENGTH_SHORT).show()
+                return
+            }
             currentPane = 1
             drawViewPic1?.clearCanvas()
             val d: Drawable = BitmapDrawable(resources, imageBitmap1)
             previewPane_1?.background = d
 
         } else if (view.getId() == R.id.b_clearPic_2) {
+            if ( imageBitmap2  == null){
+                Toast.makeText (this, "Select an image!", Toast.LENGTH_SHORT).show()
+                return
+            }
             currentPane = 2
             drawViewPic2?.clearCanvas()
             val d: Drawable = BitmapDrawable(resources, imageBitmap2)
@@ -309,67 +314,84 @@ class MainActivity : AppCompatActivity() {
 
     fun FaceSwap(view:View) {
         imageBitmap1 = imageBitmap1?.let { rescaleImage(it) }
+        imageBitmap2 = imageBitmap2?.let { rescaleImage(it) }
+
 
         imageBitmap1 = imageBitmap1?.copy(Bitmap.Config.ARGB_8888,true);
-        Log.d("DEBUG","config = $imageBitmap1.Config")
+        imageBitmap2 = imageBitmap2?.copy(Bitmap.Config.ARGB_8888,true);
+
+        Log.d("DEBUG","config pic 1 = $imageBitmap1.Config")
+        Log.d("DEBUG","config pic 2 = $imageBitmap2.Config")
 
         val face1 = FirebaseVisionImage.fromBitmap(imageBitmap1!!)
-        //val face2 = FirebaseVisionImage.fromBitmap(imageBitmap2!!)
+        val face2 = FirebaseVisionImage.fromBitmap(imageBitmap2!!)
 
         val detector = FirebaseVision.getInstance()
             .getVisionFaceDetector(options)
 
+        var faceCount1 = 0
+        var faceCount2 = 0
+        var bounds_pic1: Rect? = null
+        var bounds_pic2: Rect? = null
 
-        val result = detector.detectInImage(face1)
+
+
+        val result_pic1 = detector.detectInImage(face1)
             .addOnSuccessListener { faces ->
                 // Task completed successfully
                 // [START_EXCLUDE]
                 // [START get_face_info]
                 for (face in faces) {
-                    val bounds = face.boundingBox
-                    Log.d("DEBUG","bounds = $bounds")
+                    bounds_pic1 = face.boundingBox
+                    Log.d("DEBUG","bounds pic 1 = $bounds_pic1")
                     val rotY = face.headEulerAngleY // Head is rotated to the right rotY degrees
                     val rotZ = face.headEulerAngleZ // Head is tilted sideways rotZ degrees
 
-                    // If landmark detection was enabled (mouth, ears, eyes, cheeks, and
-                    // nose available):
-                    val leftEar = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EAR)
-                    leftEar?.let {
-                        val leftEarPos = leftEar.position
-                    }
-
-                    // If classification was enabled:
-                    if (face.smilingProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY) {
-                        val smileProb = face.smilingProbability
-                        Log.d("DEBUG","smile prob = " + smileProb)
-                    }
-                    if (face.rightEyeOpenProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY) {
-                        val rightEyeOpenProb = face.rightEyeOpenProbability
-                        val leftEyeOpenProb = face.leftEyeOpenProbability
-                        Log.d("DEBUG","eyes prob, right eye = $rightEyeOpenProb, left eye = $leftEyeOpenProb")
-                        if (rightEyeOpenProb < 70 && leftEyeOpenProb < 70){
-                            Toast.makeText (this, "Are your eyes open? Take another pic!", Toast.LENGTH_SHORT).show()
-                        }
-
-                    }
-
-                    // If face tracking was enabled:
-                    if (face.trackingId != FirebaseVisionFace.INVALID_ID) {
-                        val id = face.trackingId
-                    }
-
-
+                    faceCount1++
 
                 }
-                // [END get_face_info]
-                // [END_EXCLUDE]
             }
             .addOnFailureListener{ e ->
                 Toast.makeText (this, e.message, Toast.LENGTH_SHORT).show()
-                Log.e("DEBUG", "Failed: ${e.message}")
+                Log.e("DEBUG", "Pic 1 Failed: ${e.message}")
                 e.printStackTrace()
             }
+            .addOnCompleteListener(){
+                Log.d("DEBUG", "faces in pic 1 (complete): $faceCount1, pic 2: $faceCount2")
+            }
 
+        val result_pic2 = detector.detectInImage(face2)
+            .addOnSuccessListener { faces ->
+                // Task completed successfully
+                // [START_EXCLUDE]
+                // [START get_face_info]
+                for (face in faces) {
+                    bounds_pic2 = face.boundingBox
+                    Log.d("DEBUG","bounds pic 2 = $bounds_pic2")
+                    val rotY = face.headEulerAngleY // Head is rotated to the right rotY degrees
+                    val rotZ = face.headEulerAngleZ // Head is tilted sideways rotZ degrees
+
+                    faceCount2++
+
+                }
+            }
+            .addOnFailureListener{ e ->
+                Toast.makeText (this, e.message, Toast.LENGTH_SHORT).show()
+                Log.e("DEBUG", "Pic 2 Failed: ${e.message}")
+                e.printStackTrace()
+            }
+            .addOnCompleteListener(){
+                Log.d("DEBUG", "faces in pic 1 (complete): $faceCount1, pic 2 (complete): $faceCount2")
+                if (faceCount1 > 1 || faceCount2 > 1){
+                    Toast.makeText (this, "Too many faces in the photo!", Toast.LENGTH_SHORT).show()
+                    Log.d("DEBUG", "TOO MANY FACES RETURN \n - faces in pic 1: $faceCount1, pic 2: $faceCount2")
+                    return@addOnCompleteListener
+                }
+
+                Log.d("DEBUG","done processing - bounds pic 2 = $bounds_pic2")
+                Log.d("DEBUG","bounds pic 1 = $bounds_pic1")
+
+            }
     }
 
 
@@ -411,6 +433,14 @@ class MainActivity : AppCompatActivity() {
 
     fun blurView(view:View) {
         val scaleFactor = 20
+        val canBlurPic1 = imageBitmap1 != null && view.getId() == R.id.b_blurPic_1
+        val canBlurPic2 = imageBitmap2 != null && view.getId() == R.id.b_blurPic_2
+
+        if ( !canBlurPic1 && !canBlurPic2 ) {
+            Toast.makeText (this, "Select an image!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         var imageBitmap = if (Build.VERSION.SDK_INT < 29) {
             MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
         } else {
@@ -419,8 +449,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         when (view.getId()) {
-            R.id.b_blurPic_1 -> imageBitmap = imageBitmap1
-            R.id.b_blurPic_2 -> imageBitmap = imageBitmap2
+            R.id.b_blurPic_1 -> {
+                imageBitmap = imageBitmap1
+            }
+            R.id.b_blurPic_2 -> {
+                imageBitmap = imageBitmap2
+            }
             else -> {
                 null
             }
