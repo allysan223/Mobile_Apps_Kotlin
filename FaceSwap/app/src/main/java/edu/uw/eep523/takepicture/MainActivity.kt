@@ -410,24 +410,21 @@ class MainActivity : AppCompatActivity() {
 
 
                 Log.d("DEBUG","bounds pic 1 = $bounds_pic1")
-                Log.d("DEBUG","done processing - bounds pic 1 = $left")
-                Log.d("DEBUG","done processing - bounds pic 1 = $top")
-                Log.d("DEBUG","done processing - bounds pic 1 = $right")
-                Log.d("DEBUG","done processing - bounds pic 1 = $bottom")
+                Log.d("DEBUG","done processing - left bounds pic 1 = $left")
+                Log.d("DEBUG","done processing - top bounds pic 1 = $top")
+                Log.d("DEBUG","done processing - right bounds pic 1 = $right")
+                Log.d("DEBUG","done processing - bottom bounds pic 1 = $bottom")
                 Log.d("DEBUG","done processing - nose pic 1 = $nose_pic1")
 
                 val nose_x = nose_pic1?.getX()?.minus(100)?.toInt()
                 Log.d("DEBUG","done processing - bounds pic 2 = $bounds_pic2")
 
-                //create copy of bitmap of just the face
+                //create copy of bitmap of just the face in first pic
                 bitmap_face1 = Bitmap.createBitmap(imageBitmap1!!, left!!, top!!, bounds_pic1?.width()!!, bounds_pic1?.height()!!)
                 val d: Drawable = BitmapDrawable(resources, bitmap_face1)
                 previewPane_2?.background = d
 
-//                //create copy of bitmap of just the face
-//                bitmap_face2 = Bitmap.createBitmap(imageBitmap2!!, left!!, top!!, imageBitmap2!!.getWidth()!!, imageBitmap2?.getHeight()!!)
-//                val d2: Drawable = BitmapDrawable(resources, bitmap_face2)
-//                previewPane_2?.background = d2
+
 
 
                 //bitmap_face1 = Bitmap.createScaledBitmap( bitmap_face1!!, (bitmap_face1!!.width / 2), (bitmap_face1!!.height / 2), true)
@@ -451,26 +448,20 @@ class MainActivity : AppCompatActivity() {
 
                 Log.d("DEBUG","AFTER: int array with colors = " + intArray[0])
 
-                //add face to second pic
+                //add face from first to second pic
                 bitmap_face2 = Bitmap.createBitmap(imageBitmap2!!, 0, 0, imageBitmap2!!.getWidth()!!, imageBitmap2?.getHeight()!!)
                 bitmap_face2 = bitmap_face2?.copy(Bitmap.Config.ARGB_8888,true);
 
                 Log.d("DEBUG","int bitmap face 2 copy - test")
                 Log.d("DEBUG","face 2 rescaled hieght = " + bitmap_face2!!.getWidth() + " rescaled width = " + bitmap_face2!!.getHeight())
 
-//                val lastScanline: Int = offset + (height - 1) * stride
-//                val length: Int = pixels.size
-//                if (offset < 0 || offset + width > length
-//                    || lastScanline < 0 || lastScanline + width > length
-//                ) {
-//                    throw ArrayIndexOutOfBoundsException()
 
                 bitmap_face2!!.setPixels(
                     intArray,
                     0,
                     bitmap_face1!!.getWidth(),
-                    10,
-                    10,
+                    bounds_pic2!!.left,
+                    bounds_pic2!!.top,
                     bitmap_face1!!.getWidth(),
                     bitmap_face1!!.getHeight()
                 )
