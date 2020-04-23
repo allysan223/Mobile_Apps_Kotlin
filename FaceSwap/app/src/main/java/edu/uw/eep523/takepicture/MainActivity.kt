@@ -6,7 +6,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.ImageDecoder
+import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -24,13 +27,13 @@ import com.divyanshu.draw.widget.DrawView
 import com.google.firebase.FirebaseApp
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.firebase.ml.vision.common.FirebaseVisionPoint
 import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.IOException
 import java.util.*
-
 
 
 class MainActivity : AppCompatActivity() {
@@ -49,8 +52,6 @@ class MainActivity : AppCompatActivity() {
         .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
         .setMinFaceSize(0.15f)
         .build()
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -145,7 +146,6 @@ class MainActivity : AppCompatActivity() {
         return false
     }
 
-
     public override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
        with(outState) {
@@ -166,8 +166,6 @@ class MainActivity : AppCompatActivity() {
              //previewPane_1?.background = d
 
          }
-
-
 
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         takePictureIntent.resolveActivity(packageManager)?.let {
@@ -309,10 +307,16 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        Log.d("DEBUG","rescaled hieght = " + scaleImage?.height + " rescaled width = " + scaleImage?.width)
         return scaleImage
     }
 
     fun FaceSwap(view:View) {
+        if ( imageBitmap1 == null || imageBitmap2 == null){
+            Toast.makeText (this, "Select an image!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         imageBitmap1 = imageBitmap1?.let { rescaleImage(it) }
         imageBitmap2 = imageBitmap2?.let { rescaleImage(it) }
 
@@ -333,6 +337,9 @@ class MainActivity : AppCompatActivity() {
         var faceCount2 = 0
         var bounds_pic1: Rect? = null
         var bounds_pic2: Rect? = null
+        var bitmap_face1: Bitmap?
+        var bitmap_face2: Bitmap?
+        var nose_pic1: FirebaseVisionPoint? = null
 
 
 
@@ -343,9 +350,16 @@ class MainActivity : AppCompatActivity() {
                 // [START get_face_info]
                 for (face in faces) {
                     bounds_pic1 = face.boundingBox
-                    Log.d("DEBUG","bounds pic 1 = $bounds_pic1")
+                    //Log.d("DEBUG","bounds pic 1 = $bounds_pic1")
                     val rotY = face.headEulerAngleY // Head is rotated to the right rotY degrees
                     val rotZ = face.headEulerAngleZ // Head is tilted sideways rotZ degrees
+
+                    // If landmark detection was enabled (mouth, ears, eyes, cheeks, and
+                    // nose available):
+                    val nose = face.getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE)
+                    nose?.let {
+                        nose_pic1 = nose.position
+                    }
 
                     faceCount1++
 
@@ -367,9 +381,11 @@ class MainActivity : AppCompatActivity() {
                 // [START get_face_info]
                 for (face in faces) {
                     bounds_pic2 = face.boundingBox
-                    Log.d("DEBUG","bounds pic 2 = $bounds_pic2")
+                    //Log.d("DEBUG","bounds pic 2 = $bounds_pic2")
                     val rotY = face.headEulerAngleY // Head is rotated to the right rotY degrees
                     val rotZ = face.headEulerAngleZ // Head is tilted sideways rotZ degrees
+
+
 
                     faceCount2++
 
@@ -387,11 +403,91 @@ class MainActivity : AppCompatActivity() {
                     Log.d("DEBUG", "TOO MANY FACES RETURN \n - faces in pic 1: $faceCount1, pic 2: $faceCount2")
                     return@addOnCompleteListener
                 }
+                val bottom = bounds_pic1?.bottom
+                val left = bounds_pic1?.left
+                val top = bounds_pic1?.top
+                val right = bounds_pic1?.right
 
-                Log.d("DEBUG","done processing - bounds pic 2 = $bounds_pic2")
+
                 Log.d("DEBUG","bounds pic 1 = $bounds_pic1")
+                Log.d("DEBUG","done processing - bounds pic 1 = $left")
+                Log.d("DEBUG","done processing - bounds pic 1 = $top")
+                Log.d("DEBUG","done processing - bounds pic 1 = $right")
+                Log.d("DEBUG","done processing - bounds pic 1 = $bottom")
+                Log.d("DEBUG","done processing - nose pic 1 = $nose_pic1")
+
+                val nose_x = nose_pic1?.getX()?.minus(100)?.toInt()
+                Log.d("DEBUG","done processing - bounds pic 2 = $bounds_pic2")
+
+                //create copy of bitmap of just the face
+                bitmap_face1 = Bitmap.createBitmap(imageBitmap1!!, left!!, top!!, bounds_pic1?.width()!!, bounds_pic1?.height()!!)
+                val d: Drawable = BitmapDrawable(resources, bitmap_face1)
+                previewPane_2?.background = d
+
+//                //create copy of bitmap of just the face
+//                bitmap_face2 = Bitmap.createBitmap(imageBitmap2!!, left!!, top!!, imageBitmap2!!.getWidth()!!, imageBitmap2?.getHeight()!!)
+//                val d2: Drawable = BitmapDrawable(resources, bitmap_face2)
+//                previewPane_2?.background = d2
+
+
+                //bitmap_face1 = Bitmap.createScaledBitmap( bitmap_face1!!, (bitmap_face1!!.width / 2), (bitmap_face1!!.height / 2), true)
+                Log.d("DEBUG","face 1 rescaled hieght = " + bitmap_face1!!.getWidth() + " rescaled width = " + bitmap_face1!!.getHeight())
+
+                Log.d("DEBUG","int array init")
+                val bitmapSize = bitmap_face1!!.getWidth() * bitmap_face1!!.getHeight()
+                val intArray = IntArray(bitmapSize)
+                Log.d("DEBUG","int array init size =  $bitmapSize")
+
+                Log.d("DEBUG","BEFORE: int array with colors = " + intArray[0])
+                bitmap_face1!!.getPixels(
+                    intArray,
+                    0,
+                    bitmap_face1!!.getWidth(),
+                    0,
+                    0,
+                    bitmap_face1!!.getWidth(),
+                    bitmap_face1!!.getHeight()
+                )
+
+                Log.d("DEBUG","AFTER: int array with colors = " + intArray[0])
+
+                //add face to second pic
+                bitmap_face2 = Bitmap.createBitmap(imageBitmap2!!, 0, 0, imageBitmap2!!.getWidth()!!, imageBitmap2?.getHeight()!!)
+                bitmap_face2 = bitmap_face2?.copy(Bitmap.Config.ARGB_8888,true);
+
+                Log.d("DEBUG","int bitmap face 2 copy - test")
+                Log.d("DEBUG","face 2 rescaled hieght = " + bitmap_face2!!.getWidth() + " rescaled width = " + bitmap_face2!!.getHeight())
+
+//                val lastScanline: Int = offset + (height - 1) * stride
+//                val length: Int = pixels.size
+//                if (offset < 0 || offset + width > length
+//                    || lastScanline < 0 || lastScanline + width > length
+//                ) {
+//                    throw ArrayIndexOutOfBoundsException()
+
+                bitmap_face2!!.setPixels(
+                    intArray,
+                    0,
+                    bitmap_face1!!.getWidth(),
+                    10,
+                    10,
+                    bitmap_face1!!.getWidth(),
+                    bitmap_face1!!.getHeight()
+                )
+
+                Log.d("DEBUG","int bitmap face 2 copy pixel set - test")
+
+                //create copy of bitmap of just the face
+                //bitmap_face2 = Bitmap.createBitmap(imageBitmap2!!, left!!, top!!, imageBitmap2!!.getWidth()!!, imageBitmap2?.getHeight()!!)
+                val d2: Drawable = BitmapDrawable(resources, bitmap_face2)
+                previewPane_2?.background = d2
+
 
             }
+
+        Log.d("DEBUG","this line of code is right after the face detect ")
+
+
     }
 
 
@@ -727,8 +823,6 @@ class MainActivity : AppCompatActivity() {
         return bitmap
 
     }
-
-
 
     companion object {
         private const val KEY_IMAGE_URI = "edu.uw.eep523.takepicture.KEY_IMAGE_URI"
