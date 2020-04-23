@@ -333,10 +333,16 @@ class MainActivity : AppCompatActivity() {
         val detector = FirebaseVision.getInstance()
             .getVisionFaceDetector(options)
 
+        //used to count number of faces in each photo
         var faceCount1 = 0
         var faceCount2 = 0
+        //used to get bounds of face in each photo
         var bounds_pic1: Rect? = null
         var bounds_pic2: Rect? = null
+        //used to store just face from each photo
+        var bitmap_face1_cutout: Bitmap?
+        var bitmap_face2_cutout: Bitmap?
+        //create a copy of the imageBitmap to swap face into a new bitmap
         var bitmap_face1: Bitmap?
         var bitmap_face2: Bitmap?
         var nose_pic1: FirebaseVisionPoint? = null
@@ -420,56 +426,86 @@ class MainActivity : AppCompatActivity() {
                 Log.d("DEBUG","done processing - bounds pic 2 = $bounds_pic2")
 
                 //create copy of bitmap of just the face in first pic
-                bitmap_face1 = Bitmap.createBitmap(imageBitmap1!!, left!!, top!!, bounds_pic1?.width()!!, bounds_pic1?.height()!!)
-                val d: Drawable = BitmapDrawable(resources, bitmap_face1)
-                previewPane_2?.background = d
+                bitmap_face1_cutout = Bitmap.createBitmap(imageBitmap1!!, left!!, top!!, bounds_pic1?.width()!!, bounds_pic1?.height()!!)
 
-
+                //create copy of bitmap of just the face in second pic
+                bitmap_face2_cutout = Bitmap.createBitmap(imageBitmap2!!, bounds_pic2!!.left, bounds_pic2!!.top, bounds_pic2?.width()!!, bounds_pic2?.height()!!)
 
 
                 //bitmap_face1 = Bitmap.createScaledBitmap( bitmap_face1!!, (bitmap_face1!!.width / 2), (bitmap_face1!!.height / 2), true)
-                Log.d("DEBUG","face 1 rescaled hieght = " + bitmap_face1!!.getWidth() + " rescaled width = " + bitmap_face1!!.getHeight())
+                Log.d("DEBUG","face 1 rescaled hieght = " + bitmap_face1_cutout!!.getWidth() + " rescaled width = " + bitmap_face1_cutout!!.getHeight())
+                Log.d("DEBUG","face 2 rescaled hieght = " + bitmap_face2_cutout!!.getWidth() + " rescaled width = " + bitmap_face2_cutout!!.getHeight())
 
-                Log.d("DEBUG","int array init")
-                val bitmapSize = bitmap_face1!!.getWidth() * bitmap_face1!!.getHeight()
-                val intArray = IntArray(bitmapSize)
+
+                val bitmapSize = bitmap_face1_cutout!!.getWidth() * bitmap_face1_cutout!!.getHeight()
+                val intArrayFace1 = IntArray(bitmapSize)
                 Log.d("DEBUG","int array init size =  $bitmapSize")
+                val intArrayFace2 = IntArray(bitmap_face2_cutout!!.getWidth() * bitmap_face2_cutout!!.getHeight())
 
-                Log.d("DEBUG","BEFORE: int array with colors = " + intArray[0])
-                bitmap_face1!!.getPixels(
-                    intArray,
+                //get pixels to send to second pic
+                Log.d("DEBUG","BEFORE: int array with colors = " + intArrayFace1[0])
+                bitmap_face1_cutout!!.getPixels(
+                    intArrayFace1,
                     0,
-                    bitmap_face1!!.getWidth(),
+                    bitmap_face1_cutout!!.getWidth(),
                     0,
                     0,
-                    bitmap_face1!!.getWidth(),
-                    bitmap_face1!!.getHeight()
+                    bitmap_face1_cutout!!.getWidth(),
+                    bitmap_face1_cutout!!.getHeight()
                 )
 
-                Log.d("DEBUG","AFTER: int array with colors = " + intArray[0])
+                Log.d("DEBUG","AFTER: int array with colors = " + intArrayFace1[0])
+
+                //get pixels to send to first pic
+                bitmap_face2_cutout!!.getPixels(
+                    intArrayFace2,
+                    0,
+                    bitmap_face2_cutout!!.getWidth(),
+                    0,
+                    0,
+                    bitmap_face2_cutout!!.getWidth(),
+                    bitmap_face2_cutout!!.getHeight()
+                )
 
                 //add face from first to second pic
                 bitmap_face2 = Bitmap.createBitmap(imageBitmap2!!, 0, 0, imageBitmap2!!.getWidth()!!, imageBitmap2?.getHeight()!!)
                 bitmap_face2 = bitmap_face2?.copy(Bitmap.Config.ARGB_8888,true);
 
+                //add face from first to second pic
+                bitmap_face1 = Bitmap.createBitmap(imageBitmap1!!, 0, 0, imageBitmap1!!.getWidth()!!, imageBitmap1?.getHeight()!!)
+                bitmap_face1 = bitmap_face1?.copy(Bitmap.Config.ARGB_8888,true);
+
                 Log.d("DEBUG","int bitmap face 2 copy - test")
                 Log.d("DEBUG","face 2 rescaled hieght = " + bitmap_face2!!.getWidth() + " rescaled width = " + bitmap_face2!!.getHeight())
 
-
-                bitmap_face2!!.setPixels(
-                    intArray,
+                //add face from first bitmap to the second bitmap
+                bitmap_face2!!.setPixels( //edit second bitmap
+                    intArrayFace1, //colors from first face
                     0,
-                    bitmap_face1!!.getWidth(),
-                    bounds_pic2!!.left,
+                    bitmap_face1_cutout!!.getWidth(),
+                    bounds_pic2!!.left, //offset for second face
                     bounds_pic2!!.top,
-                    bitmap_face1!!.getWidth(),
-                    bitmap_face1!!.getHeight()
+                    bitmap_face1_cutout!!.getWidth(), //sizing from first face
+                    bitmap_face1_cutout!!.getHeight()
+                )
+
+                //add face from second bitmap to the first bitmap
+                bitmap_face1!!.setPixels( //edit first bitmap
+                    intArrayFace2, //colors from second face
+                    0,
+                    bitmap_face2_cutout!!.getWidth(),
+                    bounds_pic1!!.left, //get offset for first face
+                    bounds_pic1!!.top,
+                    bitmap_face2_cutout!!.getWidth(), //sizing from second face
+                    bitmap_face2_cutout!!.getHeight()
                 )
 
                 Log.d("DEBUG","int bitmap face 2 copy pixel set - test")
 
                 //create copy of bitmap of just the face
                 //bitmap_face2 = Bitmap.createBitmap(imageBitmap2!!, left!!, top!!, imageBitmap2!!.getWidth()!!, imageBitmap2?.getHeight()!!)
+                val d1: Drawable = BitmapDrawable(resources, bitmap_face1)
+                previewPane_1?.background = d1
                 val d2: Drawable = BitmapDrawable(resources, bitmap_face2)
                 previewPane_2?.background = d2
 
