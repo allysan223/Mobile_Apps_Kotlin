@@ -319,6 +319,9 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        imageBitmap1 = imageBitmap1_orig
+        imageBitmap2 = imageBitmap2_orig
+
         imageBitmap1 = imageBitmap1?.let { rescaleImage(it) }
         imageBitmap2 = imageBitmap2?.let { rescaleImage(it) }
 
@@ -515,6 +518,9 @@ class MainActivity : AppCompatActivity() {
                 previewPane_1?.background = d1
                 val d2: Drawable = BitmapDrawable(resources, bitmap_face2)
                 previewPane_2?.background = d2
+
+                imageBitmap1 = bitmap_face1?.copy(Bitmap.Config.ARGB_8888,true);
+                imageBitmap2 = bitmap_face2?.copy(Bitmap.Config.ARGB_8888,true);
 
 
             }
