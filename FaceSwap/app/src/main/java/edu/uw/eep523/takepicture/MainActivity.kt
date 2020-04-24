@@ -45,6 +45,8 @@ class MainActivity : AppCompatActivity() {
     private var drawViewPic2: DrawView? = null
     private var imageBitmap1: Bitmap? = null
     private var imageBitmap2: Bitmap? = null
+    private var imageBitmap1_orig: Bitmap? = null
+    private var imageBitmap2_orig: Bitmap? = null
 
     val options = FirebaseVisionFaceDetectorOptions.Builder()
         .setClassificationMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
@@ -192,23 +194,23 @@ class MainActivity : AppCompatActivity() {
 
     fun ClearDrawView(view:View) {
         if (view.getId() == R.id.b_clearPic_1){
-            if ( imageBitmap1 == null ){
+            if ( imageBitmap1_orig == null ){
                 Toast.makeText (this, "Select an image!", Toast.LENGTH_SHORT).show()
                 return
             }
             currentPane = 1
             drawViewPic1?.clearCanvas()
-            val d: Drawable = BitmapDrawable(resources, imageBitmap1)
+            val d: Drawable = BitmapDrawable(resources, imageBitmap1_orig)
             previewPane_1?.background = d
 
         } else if (view.getId() == R.id.b_clearPic_2) {
-            if ( imageBitmap2  == null){
+            if ( imageBitmap2_orig  == null){
                 Toast.makeText (this, "Select an image!", Toast.LENGTH_SHORT).show()
                 return
             }
             currentPane = 2
             drawViewPic2?.clearCanvas()
-            val d: Drawable = BitmapDrawable(resources, imageBitmap2)
+            val d: Drawable = BitmapDrawable(resources, imageBitmap2_orig)
             previewPane_2?.background = d
         }
     }
@@ -408,7 +410,12 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText (this, "Too many faces in the photo!", Toast.LENGTH_SHORT).show()
                     Log.d("DEBUG", "TOO MANY FACES RETURN \n - faces in pic 1: $faceCount1, pic 2: $faceCount2")
                     return@addOnCompleteListener
+                } else if (faceCount1 < 1 || faceCount2 < 1) {
+                    Toast.makeText (this, "No faces detected, please try another photo.", Toast.LENGTH_SHORT).show()
+                    Log.d("DEBUG", "no faces detected \n - faces in pic 1: $faceCount1, pic 2: $faceCount2")
+                    return@addOnCompleteListener
                 }
+
                 val bottom = bounds_pic1?.bottom
                 val left = bounds_pic1?.left
                 val top = bounds_pic1?.top
@@ -544,9 +551,11 @@ class MainActivity : AppCompatActivity() {
             val d: Drawable = BitmapDrawable(resources, imageBitmap)
             if (currentPane == 1){
                 imageBitmap1 = imageBitmap
+                imageBitmap1_orig = imageBitmap
                 previewPane_1?.background = d //previewPane is the ImageView from the layout
             } else if (currentPane == 2){
                 imageBitmap2 = imageBitmap
+                imageBitmap2_orig = imageBitmap
                 previewPane_2?.background = d //previewPane is the ImageView from the layout
 
             }
