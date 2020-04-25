@@ -1,6 +1,4 @@
-Allysa Nguyen 
-
-<allysan@uw.edu> 
+Allysa Nguyen   <allysan@uw.edu> 
 
 Face Swap 
 ----
