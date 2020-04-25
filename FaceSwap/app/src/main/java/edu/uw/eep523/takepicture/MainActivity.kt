@@ -40,6 +40,8 @@ class MainActivity : AppCompatActivity() {
 
     private var isLandScape: Boolean = false
     private var imageUri: Uri? = null
+    private var imageUri1: Uri? = null
+    private var imageUri2: Uri? = null
     private var currentPane = 1
     private var drawViewPic1: DrawView? = null
     private var drawViewPic2: DrawView? = null
@@ -99,6 +101,8 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
+
     private fun getRequiredPermissions(): Array<String?> {
         return try {
             val info = this.packageManager
@@ -150,12 +154,46 @@ class MainActivity : AppCompatActivity() {
 
     public override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-       with(outState) {
+        Log.d("DEBUG", "onSaveInstanceState")
+        with(outState) {
             putParcelable(KEY_IMAGE_URI, imageUri)
+            putParcelable(KEY_IMAGE_URI1, imageUri1)
+            putParcelable(KEY_IMAGE_URI2, imageUri2)
+            putInt(KEY_CURRENT_PANE, currentPane)
+
         }
+        Log.d("DEBUG", "current pane = $currentPane")
     }
 
-     fun startCameraIntentForResult(view:View) {
+    override fun onRestoreInstanceState(savedState: Bundle) {
+        Log.d("DEBUG", "onRestoreInstanceState")
+        imageUri = savedState.getParcelable(KEY_IMAGE_URI)
+        imageUri1 = savedState.getParcelable(KEY_IMAGE_URI1)
+        imageUri2 = savedState.getParcelable(KEY_IMAGE_URI2)
+        currentPane = savedState.getInt(KEY_CURRENT_PANE)
+
+        if ( currentPane == 1) {
+            imageUri = imageUri1
+            tryReloadAndDetectInImage()
+            currentPane = 2
+            imageUri = imageUri2
+            tryReloadAndDetectInImage()
+            currentPane = 1 //go back to currentPane
+
+        } else if (currentPane == 2) {
+            imageUri = imageUri2
+            tryReloadAndDetectInImage()
+            currentPane = 1
+            imageUri = imageUri1
+            tryReloadAndDetectInImage()
+            currentPane = 2 //go back to currentPane
+        }
+
+        //tryReloadAndDetectInImage()
+        Log.d("DEBUG", "current pane = $currentPane")
+    }
+
+    fun startCameraIntentForResult(view:View) {
         // Clean up last time's image
         imageUri = null
          if( view.getId() == R.id.b_takePic_1){
@@ -556,10 +594,12 @@ class MainActivity : AppCompatActivity() {
             detectSmile(imageBitmap)
             val d: Drawable = BitmapDrawable(resources, imageBitmap)
             if (currentPane == 1){
+                imageUri1 = imageUri
                 imageBitmap1 = imageBitmap
                 imageBitmap1_orig = imageBitmap
                 previewPane_1?.background = d //previewPane is the ImageView from the layout
             } else if (currentPane == 2){
+                imageUri2 = imageUri
                 imageBitmap2 = imageBitmap
                 imageBitmap2_orig = imageBitmap
                 previewPane_2?.background = d //previewPane is the ImageView from the layout
@@ -868,6 +908,9 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val KEY_IMAGE_URI = "edu.uw.eep523.takepicture.KEY_IMAGE_URI"
+        private const val KEY_IMAGE_URI1 = "edu.uw.eep523.takepicture.KEY_IMAGE_URI1"
+        private const val KEY_IMAGE_URI2 = "edu.uw.eep523.takepicture.KEY_IMAGE_URI2"
+        private const val KEY_CURRENT_PANE = "edu.uw.eep523.takepicture.KEY_CURRENT_PANE"
         private const val REQUEST_IMAGE_CAPTURE = 1001
         private const val REQUEST_CHOOSE_IMAGE = 1002
         private const val PERMISSION_REQUESTS = 1

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--The LinearLayout is the root element of the layout hierarchy, and thus
+it must specify the Android Resource XML namespace at http://schemas.android.com/apk/res/android-->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/PicureTopLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000"
+    android:keepScreenOn="true"
+    android:orientation="vertical">
+
+
+    <Button
+        android:id="@+id/b_blurPic_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:onClick="blurView"
+        android:text="Blur"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/b_clearPic_1"
+        app:layout_constraintTop_toBottomOf="@+id/b_takePic_1" />
+
+    <com.divyanshu.draw.widget.DrawView
+        android:id="@+id/previewPane_1"
+        android:layout_width="195dp"
+        android:layout_height="214dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:scaleType="fitStart"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <Button
+        android:id="@+id/b_takePic_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:onClick="startCameraIntentForResult"
+        android:text="Take photo"
+        app:layout_constraintStart_toEndOf="@+id/b_selectPic_1"
+        app:layout_constraintTop_toBottomOf="@+id/previewPane_1" />
+
+    <Button
+        android:id="@+id/b_selectPic_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:onClick="startChooseImageIntentForResult"
+        android:text="Select photo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/previewPane_1" />
+
+    <Button
+        android:id="@+id/b_clearPic_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:onClick="ClearDrawView"
+        android:text="Clear"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/b_selectPic_1" />
+
+    <com.divyanshu.draw.widget.DrawView
+        android:id="@+id/previewPane_2"
+        android:layout_width="195dp"
+        android:layout_height="214dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="24dp"
+        android:scaleType="fitStart"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/b_takePic_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:onClick="startCameraIntentForResult"
+        android:text="Take photo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/previewPane_2" />
+
+    <Button
+        android:id="@+id/b_selectPic_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:onClick="startChooseImageIntentForResult"
+        android:text="Select photo"
+        app:layout_constraintEnd_toStartOf="@+id/b_takePic_2"
+        app:layout_constraintTop_toBottomOf="@+id/previewPane_2" />
+
+    <Button
+        android:id="@+id/b_clearPic_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:onClick="ClearDrawView"
+        android:text="Clear"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/b_blurPic_2"
+        app:layout_constraintTop_toBottomOf="@+id/b_selectPic_2" />
+
+    <Button
+        android:id="@+id/b_blurPic_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:onClick="blurView"
+        android:text="Blur"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/b_takePic_2" />
+
+    <Button
+        android:id="@+id/b_faceSwap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="FaceSwap"
+        android:text="Face Swap!"
+        app:layout_constraintBottom_toBottomOf="@+id/previewPane_1"
+        app:layout_constraintEnd_toStartOf="@+id/previewPane_2"
+        app:layout_constraintStart_toEndOf="@+id/previewPane_1"
+        app:layout_constraintTop_toTopOf="@+id/previewPane_1" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
