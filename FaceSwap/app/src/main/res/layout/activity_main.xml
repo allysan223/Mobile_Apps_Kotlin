@@ -26,11 +26,14 @@ it must specify the Android Resource XML namespace at http://schemas.android.com
 
     <com.divyanshu.draw.widget.DrawView
         android:id="@+id/previewPane_1"
-        android:layout_width="207dp"
+        android:layout_width="0dp"
         android:layout_height="250dp"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="100dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginBottom="450dp"
         android:scaleType="fitStart"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -54,9 +57,10 @@ it must specify the Android Resource XML namespace at http://schemas.android.com
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="left"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:onClick="startChooseImageIntentForResult"
         android:text="Select photo"
+        android:textSize="12sp"
         app:layout_constraintEnd_toStartOf="@+id/b_takePic_1"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -76,14 +80,20 @@ it must specify the Android Resource XML namespace at http://schemas.android.com
 
     <com.divyanshu.draw.widget.DrawView
         android:id="@+id/previewPane_2"
-        android:layout_width="207dp"
+        android:layout_width="0dp"
         android:layout_height="250dp"
         android:layout_alignParentTop="true"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginBottom="80dp"
         android:scaleType="fitStart"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/b_selectPic_1" />
+        app:layout_constraintTop_toBottomOf="@+id/b_faceSwap"
+        app:layout_constraintVertical_bias="1.0" />
 
     <Button
         android:id="@+id/b_takePic_2"
@@ -102,10 +112,11 @@ it must specify the Android Resource XML namespace at http://schemas.android.com
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="left"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
         android:onClick="startChooseImageIntentForResult"
         android:text="Select photo"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/b_takePic_2"
         app:layout_constraintHorizontal_bias="0.5"
@@ -140,9 +151,9 @@ it must specify the Android Resource XML namespace at http://schemas.android.com
         android:id="@+id/b_faceSwap"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:onClick="FaceSwap"
         android:text="Face Swap!"
-        app:layout_constraintBottom_toTopOf="@+id/previewPane_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/b_takePic_1" />
