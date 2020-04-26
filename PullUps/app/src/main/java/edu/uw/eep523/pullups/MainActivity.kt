@@ -5,36 +5,42 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.jjoe64.graphview.DefaultLabelFormatter
 import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
 import kotlinx.android.synthetic.main.activity_main.*
 import java.text.NumberFormat
+import kotlin.math.pow
+import kotlin.math.sqrt
 
+private const val SHAKE_THRESHOLD = 10000
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private lateinit var mSeriesXaccel: LineGraphSeries<DataPoint>
     private lateinit var mSeriesYaccel: LineGraphSeries<DataPoint>
     private lateinit var mSeriesZaccel: LineGraphSeries<DataPoint>
+    private lateinit var mSeriesMagAccel: LineGraphSeries<DataPoint>
 
     private lateinit var mSensorManager: SensorManager
     private lateinit var mSensor: Sensor
     private lateinit var mSensorG: Sensor
 
-    val linear_acceleration: Array<Float> = arrayOf(0.0f,0.0f,0.0f)
+    val accel: Array<Float> = arrayOf(0.0f,0.0f,0.0f,0.0f)
+    val last_accel: Array<Float> = arrayOf(0.0f,0.0f,0.0f,0.0f)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
+        mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
         mSensor = if (mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
             mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
@@ -49,9 +55,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         mSeriesXaccel = LineGraphSeries()
         mSeriesYaccel = LineGraphSeries()
         mSeriesZaccel = LineGraphSeries()
+        mSeriesMagAccel = LineGraphSeries()
+
         initGraphRT(mGraphX,mSeriesXaccel!!)
         initGraphRT(mGraphY,mSeriesYaccel!!)
         initGraphRT(mGraphZ,mSeriesZaccel!!)
+        initGraphRT(mGraphMag,mSeriesMagAccel!!)
     }
 
     override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
@@ -74,16 +83,35 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
              * CPU resources.
        */
 
-        linear_acceleration[0] = event.values[0]
-        linear_acceleration[1] = event.values[1]
-        linear_acceleration[2] = event.values[2]
+        accel[0] = event.values[0] //X
+        accel[1] = event.values[1] //Y
+        accel[2] = event.values[2] //Z
+        accel[3] = magnitude(accel[0], accel[1], accel[2])
 
 
         val xval = System.currentTimeMillis()/1000.toDouble()//graphLastXValue += 0.1
-        mSeriesXaccel!!.appendData(DataPoint(xval, linear_acceleration[0].toDouble()), true, 50)
-        mSeriesYaccel!!.appendData(DataPoint(xval, linear_acceleration[1].toDouble()), true, 50)
-        mSeriesZaccel!!.appendData(DataPoint(xval, linear_acceleration[2].toDouble()), true, 50)
+        mSeriesXaccel!!.appendData(DataPoint(xval, accel[0].toDouble()), true, 50)
+        mSeriesYaccel!!.appendData(DataPoint(xval, accel[1].toDouble()), true, 50)
+        mSeriesZaccel!!.appendData(DataPoint(xval, accel[2].toDouble()), true, 50)
+        mSeriesMagAccel!!.appendData(DataPoint(xval, accel[3].toDouble()), true, 50)
 
+        val speed: Float =
+            Math.abs(accel[0] + accel[1] + accel[2] - last_accel[0] - last_accel[1] - last_accel[2]) / 4 * 10000
+
+        if (speed > SHAKE_THRESHOLD) {
+            Log.d("sensor", "shake detected w/ speed: $speed")
+            Toast.makeText(this, "shake detected w/ speed: $speed", Toast.LENGTH_SHORT).show()
+        }
+        last_accel[0] = accel[0]
+        last_accel[1] = accel[1]
+        last_accel[2] = accel[2]
+
+    }
+
+    private fun magnitude(x: Float, y: Float, z: Float): Float {
+        var mag = x.pow(2) + y.pow(2) + z.pow(2)
+        mag = sqrt(mag)
+        return mag
     }
 
 
