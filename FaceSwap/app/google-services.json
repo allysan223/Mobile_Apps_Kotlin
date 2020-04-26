@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "706583966334",
+    "firebase_url": "https://faceswap-57fe1.firebaseio.com",
+    "project_id": "faceswap-57fe1",
+    "storage_bucket": "faceswap-57fe1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:706583966334:android:d96bb7b4ae3b0141635e2f",
+        "android_client_info": {
+          "package_name": "edu.uw.eep523.takepicture"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "706583966334-dpirtlg8i86269jop463fkvlv5nb1i8t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDovgULDaunQeBma2ecqhLTPMU-zox__04"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "706583966334-dpirtlg8i86269jop463fkvlv5nb1i8t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
