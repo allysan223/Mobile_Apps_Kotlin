@@ -1,5 +1,6 @@
 package edu.uw.eep523.pullups
 
+import android.app.AlertDialog
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -16,10 +17,11 @@ import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
 import kotlinx.android.synthetic.main.activity_main.*
 import java.text.NumberFormat
+import kotlin.math.floor
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-private const val SHAKE_THRESHOLD = 10000
+
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
 
@@ -32,8 +34,20 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var mSensor: Sensor
     private lateinit var mSensorG: Sensor
 
+    var pullUpMode = false
+    var pullUpPosUp : Boolean = false
+    var pullUpCounter = 0
+    var elapsedTime = 0.0
+
+    //on app start up, speed is high, this bypasses that to prevent pull up mode to start instantly
+    var initFlag = false
+
     val accel: Array<Float> = arrayOf(0.0f,0.0f,0.0f,0.0f)
     val last_accel: Array<Float> = arrayOf(0.0f,0.0f,0.0f,0.0f)
+    var mean = 0.0
+
+    private var slidingWindow = DoubleArray(5)
+    private var meanWindow = DoubleArray(2)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,28 +97,61 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
              * CPU resources.
        */
 
-        accel[0] = event.values[0] //X
-        accel[1] = event.values[1] //Y
-        accel[2] = event.values[2] //Z
-        accel[3] = magnitude(accel[0], accel[1], accel[2])
+        // read values from accelerometer and calculate magnitude
+        accel[0] = event.values[0] // X
+        accel[1] = event.values[1] // Y
+        accel[2] = event.values[2] // Z
+        accel[3] = magnitude(accel[0], accel[1], accel[2]) // magnitude
+        //Log.d("sensor", "magnitude = ${accel[3].toDouble()}")
+        mean = addToWindow(slidingWindow, accel[3].toDouble())
 
-
+        // plot values
         val xval = System.currentTimeMillis()/1000.toDouble()//graphLastXValue += 0.1
         mSeriesXaccel!!.appendData(DataPoint(xval, accel[0].toDouble()), true, 50)
         mSeriesYaccel!!.appendData(DataPoint(xval, accel[1].toDouble()), true, 50)
         mSeriesZaccel!!.appendData(DataPoint(xval, accel[2].toDouble()), true, 50)
         mSeriesMagAccel!!.appendData(DataPoint(xval, accel[3].toDouble()), true, 50)
 
+        // calculate speed to determine shake
         val speed: Float =
             Math.abs(accel[0] + accel[1] + accel[2] - last_accel[0] - last_accel[1] - last_accel[2]) / 4 * 10000
 
-        if (speed > SHAKE_THRESHOLD) {
+        if (speed > SHAKE_THRESHOLD && initFlag && !pullUpMode ) {
             Log.d("sensor", "shake detected w/ speed: $speed")
-            Toast.makeText(this, "shake detected w/ speed: $speed", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Pull up counter started!", Toast.LENGTH_SHORT).show()
+            //showDialog()
+            pullUpMode = true
         }
+
         last_accel[0] = accel[0]
         last_accel[1] = accel[1]
         last_accel[2] = accel[2]
+
+        // detect pull ups if in pull up mode
+        addToWindow(meanWindow, mean)
+        if (pullUpMode && initFlag) {
+            //Log.d("sensor", "pull up detected")
+            Log.d("sensor", "mean of sliding window = $mean")
+            if (meanWindow[0] > 11) {
+                if (!pullUpPosUp){
+                    if (floor(meanWindow[1]) == 10.0) {
+                        pullUpPosUp = !pullUpPosUp //set pos to up
+                        pullUpCounter += 1
+                        Log.d("sensor", "PULL UP POS = UP")
+                    }
+                } else if (pullUpPosUp) {
+                    if (floor(meanWindow[1]) == 10.0) {
+                        pullUpPosUp = !pullUpPosUp //set pos to down
+                        Log.d("sensor", "PULL UP POS = DOWN")
+                    }
+                }
+                //Log.d("sensor", "PULL UP POS = $pullUpPos")
+            }
+
+        }
+
+        //on app start up, speed is high, this bypasses that to prevent pull up mode to start instantly
+        initFlag = true
 
     }
 
@@ -112,6 +159,25 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         var mag = x.pow(2) + y.pow(2) + z.pow(2)
         mag = sqrt(mag)
         return mag
+    }
+
+    private fun addToWindow(window: DoubleArray, x: Double) : Double {
+        var sum = 0.0;
+        var values = ""
+        // Shift everything one to the left
+        for (i in 1 until window.size) {
+            window[i - 1] = window[i]
+        }
+        // Add the new data point
+        window[window.size - 1] = x
+
+        for (num in window){
+            sum += num
+            values += "$num "
+        }
+
+        //Log.d("sensor", "sliding window values: " + values)
+        return sum/window.size
     }
 
 
@@ -124,7 +190,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
 
         mGraph.getViewport().setMinY(0.0);
-        mGraph.getViewport().setMaxY(10.0);
+        mGraph.getViewport().setMaxY(12.0);
         mGraph.getGridLabelRenderer().setLabelVerticalWidth(100)
 
         // first mSeries is a line
@@ -172,5 +238,44 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         mSensorManager.unregisterListener(this)
     }
 
+    private fun showDialog() {
+        // Initialize a new instance of
+        val builder = AlertDialog.Builder(this@MainActivity)
+
+        // Set the alert dialog title
+        builder.setTitle("Start Pull Ups")
+
+        // Display a message on alert dialog
+        builder.setMessage("Ready to start pull ups?")
+
+        // Set a positive button and its click listener on alert dialog
+        builder.setPositiveButton("YES"){dialog, which ->
+            // Do something when user press the positive button
+            Toast.makeText(applicationContext,"Ok, we change the app background.",Toast.LENGTH_SHORT).show()
+
+        }
+
+
+        // Display a negative button on alert dialog
+        builder.setNegativeButton("No"){dialog,which ->
+            Toast.makeText(applicationContext,"You are not agree.",Toast.LENGTH_SHORT).show()
+        }
+
+
+        // Display a neutral button on alert dialog
+        builder.setNeutralButton("Cancel"){_,_ ->
+            Toast.makeText(applicationContext,"You cancelled the dialog.",Toast.LENGTH_SHORT).show()
+        }
+
+        // Finally, make the alert dialog using builder
+        val dialog: AlertDialog = builder.create()
+
+        // Display the alert dialog on app interface
+        dialog.show()
+    }
+
+    companion object {
+        private const val SHAKE_THRESHOLD = 11000
+    }
 
 }
