@@ -136,6 +136,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     if (floor(meanWindow[1]) == 10.0) {
                         pullUpPosUp = !pullUpPosUp //set pos to up
                         pullUpCounter += 1
+                        tv_numPullUps.text = pullUpCounter.toString()
                         Log.d("sensor", "PULL UP POS = UP")
                     }
                 } else if (pullUpPosUp) {
@@ -263,7 +264,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 return@setPositiveButton
             }
             tv_mode.text = modes[1] + ", Number of Pull Ups: " + goal
-            Toast.makeText(applicationContext,"Counter started in free mode!",Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext,"Counter started in goal mode!",Toast.LENGTH_SHORT).show()
             pullUpStarted = true
         }
 
@@ -272,7 +273,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         builder.setNegativeButton("Free Mode"){dialog,which ->
             pullUpMode = modes[0]
             tv_mode.text = modes[0]
-            Toast.makeText(applicationContext,"Please enter the number of pull ups",Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext,"Counter started in free mode!",Toast.LENGTH_SHORT).show()
             pullUpStarted = true
         }
 
