@@ -37,10 +37,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     var pullUpMode = false
     var pullUpPosUp : Boolean = false
     var pullUpCounter = 0
-    var elapsedTime = 0.0
 
     //on app start up, speed is high, this bypasses that to prevent pull up mode to start instantly
     var initFlag = false
+    var shakeFlag = false
 
     val accel: Array<Float> = arrayOf(0.0f,0.0f,0.0f,0.0f)
     val last_accel: Array<Float> = arrayOf(0.0f,0.0f,0.0f,0.0f)
@@ -116,11 +116,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val speed: Float =
             Math.abs(accel[0] + accel[1] + accel[2] - last_accel[0] - last_accel[1] - last_accel[2]) / 4 * 10000
 
-        if (speed > SHAKE_THRESHOLD && initFlag && !pullUpMode ) {
+        //shake detected
+        if (speed > SHAKE_THRESHOLD && initFlag && !shakeFlag ) {
             Log.d("sensor", "shake detected w/ speed: $speed")
-            Toast.makeText(this, "Pull up counter started!", Toast.LENGTH_SHORT).show()
-            //showDialog()
-            pullUpMode = true
+            showDialog()
+            shakeFlag = true
         }
 
         last_accel[0] = accel[0]
@@ -251,19 +251,22 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         // Set a positive button and its click listener on alert dialog
         builder.setPositiveButton("YES"){dialog, which ->
             // Do something when user press the positive button
-            Toast.makeText(applicationContext,"Ok, we change the app background.",Toast.LENGTH_SHORT).show()
+            pullUpMode = true
+            Toast.makeText(applicationContext,"Counter started!",Toast.LENGTH_SHORT).show()
 
         }
 
 
         // Display a negative button on alert dialog
         builder.setNegativeButton("No"){dialog,which ->
-            Toast.makeText(applicationContext,"You are not agree.",Toast.LENGTH_SHORT).show()
+            shakeFlag = false
+            Toast.makeText(applicationContext,"Maybe next time.",Toast.LENGTH_SHORT).show()
         }
 
 
         // Display a neutral button on alert dialog
         builder.setNeutralButton("Cancel"){_,_ ->
+            shakeFlag = false
             Toast.makeText(applicationContext,"You cancelled the dialog.",Toast.LENGTH_SHORT).show()
         }
 
