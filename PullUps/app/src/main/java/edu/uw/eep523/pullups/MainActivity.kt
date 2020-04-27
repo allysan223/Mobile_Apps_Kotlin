@@ -34,7 +34,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var mSensor: Sensor
     private lateinit var mSensorG: Sensor
 
-    var pullUpMode = false
+    var pullUpMode = modes[0]
+    var pullUpStarted : Boolean = false
     var pullUpPosUp : Boolean = false
     var pullUpCounter = 0
 
@@ -71,10 +72,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         mSeriesZaccel = LineGraphSeries()
         mSeriesMagAccel = LineGraphSeries()
 
-        initGraphRT(mGraphX,mSeriesXaccel!!)
-        initGraphRT(mGraphY,mSeriesYaccel!!)
-        initGraphRT(mGraphZ,mSeriesZaccel!!)
-        initGraphRT(mGraphMag,mSeriesMagAccel!!)
     }
 
     override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
@@ -129,7 +126,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         // detect pull ups if in pull up mode
         addToWindow(meanWindow, mean)
-        if (pullUpMode && initFlag) {
+        if (pullUpStarted && initFlag) {
             //Log.d("sensor", "pull up detected")
             Log.d("sensor", "mean of sliding window = $mean")
             if (meanWindow[0] > 11) {
@@ -243,31 +240,35 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val builder = AlertDialog.Builder(this@MainActivity)
 
         // Set the alert dialog title
-        builder.setTitle("Start Pull Ups")
+        builder.setTitle("Starting Pull Ups!")
 
         // Display a message on alert dialog
-        builder.setMessage("Ready to start pull ups?")
+        builder.setMessage("First, please select a mode")
 
         // Set a positive button and its click listener on alert dialog
-        builder.setPositiveButton("YES"){dialog, which ->
+        builder.setPositiveButton("Goal Mode"){dialog, which ->
             // Do something when user press the positive button
-            pullUpMode = true
-            Toast.makeText(applicationContext,"Counter started!",Toast.LENGTH_SHORT).show()
+            pullUpStarted = true
+            pullUpMode = modes[1]
+            tv_mode.text = modes[1]
+            Toast.makeText(applicationContext,"Counter started in free mode!",Toast.LENGTH_SHORT).show()
 
         }
 
 
         // Display a negative button on alert dialog
-        builder.setNegativeButton("No"){dialog,which ->
-            shakeFlag = false
-            Toast.makeText(applicationContext,"Maybe next time.",Toast.LENGTH_SHORT).show()
+        builder.setNegativeButton("Free Mode"){dialog,which ->
+            pullUpStarted = true
+            pullUpMode = modes[0]
+            tv_mode.text = modes[0]
+            Toast.makeText(applicationContext,"Please enter the number of pull ups",Toast.LENGTH_SHORT).show()
         }
 
 
         // Display a neutral button on alert dialog
         builder.setNeutralButton("Cancel"){_,_ ->
             shakeFlag = false
-            Toast.makeText(applicationContext,"You cancelled the dialog.",Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext,"Maybe next time.",Toast.LENGTH_SHORT).show()
         }
 
         // Finally, make the alert dialog using builder
@@ -279,6 +280,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     companion object {
         private const val SHAKE_THRESHOLD = 11000
+        private val modes = arrayOf("free", "goal")
     }
 
 }

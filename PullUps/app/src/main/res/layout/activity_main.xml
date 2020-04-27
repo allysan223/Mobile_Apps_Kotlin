@@ -7,80 +7,38 @@
     android:orientation="vertical"
     tools:context="edu.uw.eep523.pullups.MainActivity">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:text="Accelerometer X values"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/textX" android:layout_weight="1"/>
-
-    </LinearLayout>
-
-    <com.jjoe64.graphview.GraphView
-        android:layout_weight="1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/mGraphX"/>
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:text="Accelerometer Y values"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:id="@+id/textY" android:layout_weight="1"/>
-
-    </LinearLayout>
-    <com.jjoe64.graphview.GraphView
-        android:layout_weight="1"
-
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/mGraphY"/>
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:text="Accelerometer Z values"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:id="@+id/textZ" android:layout_weight="1"/>
-
-    </LinearLayout>
-    <com.jjoe64.graphview.GraphView
-        android:layout_weight="1"
-
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/mGraphZ"/>
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:text="Accelerometer Mag values"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:id="@+id/textMag" android:layout_weight="1"/>
-
-    </LinearLayout>
-    <com.jjoe64.graphview.GraphView
-        android:layout_weight="1"
-
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/mGraphMag"/>
-
-
-
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content" tools:srcCompat="@tools:sample/avatars[0]"
         android:id="@+id/imageView"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tv_modeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mode: "
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tv_mode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Shake to begin!"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView" />
+
 </LinearLayout>
