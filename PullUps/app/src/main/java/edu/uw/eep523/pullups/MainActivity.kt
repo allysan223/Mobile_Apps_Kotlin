@@ -1,11 +1,13 @@
 package edu.uw.eep523.pullups
 
 import android.app.AlertDialog
+import android.app.PendingIntent.getActivity
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
@@ -24,8 +26,9 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 
-
 class MainActivity : AppCompatActivity(), SensorEventListener {
+
+    private  var mp: MediaPlayer? = null
 
     private lateinit var mSeriesXaccel: LineGraphSeries<DataPoint>
     private lateinit var mSeriesYaccel: LineGraphSeries<DataPoint>
@@ -40,6 +43,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     var pullUpStarted : Boolean = false
     var pullUpPosUp : Boolean = false
     var pullUpCounter = 0
+    var goalPullUps = ""
 
     //on app start up, speed is high, this bypasses that to prevent pull up mode to start instantly
     var initFlag = false
@@ -57,6 +61,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         setContentView(R.layout.activity_main)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
+
+
         mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
         mSensor = if (mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
@@ -73,6 +79,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         mSeriesYaccel = LineGraphSeries()
         mSeriesZaccel = LineGraphSeries()
         mSeriesMagAccel = LineGraphSeries()
+
 
     }
 
@@ -138,6 +145,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                         pullUpCounter += 1
                         tv_numPullUps.text = pullUpCounter.toString()
                         Log.d("sensor", "PULL UP POS = UP")
+                        if (pullUpCounter == goalPullUps.toInt()){
+                            playSound()
+                            tv_mode.text = "CONGRATS!\nYOU MET YOUR GOAL!\n\nYou can continue to do more pull ups if you'd like."
+                        }
                     }
                 } else if (pullUpPosUp) {
                     if (floor(meanWindow[1]) == 10.0) {
@@ -180,6 +191,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         return sum/window.size
     }
 
+    private fun playSound() {
+        mp = MediaPlayer.create(this, R.raw.starwars)
+        mp?.start()
+    }
 
     private fun initGraphRT(mGraph: GraphView, mSeriesXaccel :LineGraphSeries<DataPoint>){
 
@@ -226,21 +241,26 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onResume() {
         Log.d("tag","onResume")
         super.onResume()
+        mSensorManager.registerListener(this, mSensor, 40000)
     }
 
     override fun onPause() {
         super.onPause()
+        mSensorManager.unregisterListener(this)
+        mp?.stop()
         Log.d("tag","onPause")
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        mp?.stop()
         mSensorManager.unregisterListener(this)
     }
 
     private fun showDialog() {
         val taskEditText = EditText(this)
         taskEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+        taskEditText.hint = "Enter number here for Goal Mode"
 
         // Initialize a new instance of
         val builder = AlertDialog.Builder(this@MainActivity)
@@ -249,21 +269,21 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         builder.setTitle("Starting Pull Ups!")
 
         // Display a message on alert dialog
-        builder.setMessage("Please select a mode. \nEnter a number below for goal mode!")
+        builder.setMessage("Please select a mode.")
 
         // Display an edit text field
         builder.setView(taskEditText)
 
         // Set a positive button and its click listener on alert dialog
-        builder.setPositiveButton("Goal Mode"){dialog, which -> val goal = taskEditText.text.toString()
+        builder.setPositiveButton("Goal Mode"){dialog, which -> goalPullUps = taskEditText.text.toString()
             // Do something when user press the positive button
             pullUpMode = modes[1]
-            if (goal < 1.toString() || goal.isEmpty()) {
+            if (goalPullUps < 1.toString() || goalPullUps.isEmpty()) {
                 Toast.makeText(applicationContext,"Please enter a valid number!",Toast.LENGTH_SHORT).show()
                 shakeFlag = false
                 return@setPositiveButton
             }
-            tv_mode.text = modes[1] + ", Number of Pull Ups: " + goal
+            tv_mode.text = modes[1] + "\nNumber of Pull Ups: $goalPullUps"
             Toast.makeText(applicationContext,"Counter started in goal mode!",Toast.LENGTH_SHORT).show()
             pullUpStarted = true
         }
