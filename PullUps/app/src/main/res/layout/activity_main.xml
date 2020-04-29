@@ -48,4 +48,16 @@
         android:textAlignment="center"
         android:textSize="50sp" />
 
+    <Button
+        android:id="@+id/b_stop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:background="#F44336"
+        android:text="Stop"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:visibility="visible"
+        tools:visibility="invisible" />
+
 </LinearLayout>

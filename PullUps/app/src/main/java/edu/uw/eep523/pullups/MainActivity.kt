@@ -1,7 +1,7 @@
 package edu.uw.eep523.pullups
 
+
 import android.app.AlertDialog
-import android.app.PendingIntent.getActivity
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -11,7 +11,9 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
+import android.view.View
 import android.view.WindowManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -38,10 +40,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var mSensorManager: SensorManager
     private lateinit var mSensor: Sensor
     private lateinit var mSensorG: Sensor
+    private lateinit var btnStop: Button
 
     var pullUpMode = modes[0]
     var pullUpStarted : Boolean = false
-    var pullUpPosUp : Boolean = false
+    var pullUpPosUp : Boolean = false //start in down position
+    var pullUpStopped : Boolean = false
     var pullUpCounter = 0
     var goalPullUps = ""
 
@@ -60,6 +64,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        btnStop = findViewById<Button>(R.id.b_stop)
+        btnStop.visibility = View.INVISIBLE;
+        // set on-click listener
+        btnStop.setOnClickListener {
+            stopPullUps()
+        }
 
 
 
@@ -125,7 +136,18 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         //shake detected
         if (speed > SHAKE_THRESHOLD && initFlag && !shakeFlag ) {
             Log.d("sensor", "shake detected w/ speed: $speed")
-            showDialog()
+            if (pullUpStopped) {
+                pullUpStarted = true
+                pullUpStopped = false
+                btnStop.visibility = View.VISIBLE;
+                tv_mode.text = when(pullUpMode) {
+                    modes[0] -> "modes[0]"
+                    modes[1] -> modes[1] + "\nNumber of Pull Ups: $goalPullUps"
+                    else -> ""
+                }
+            } else {
+                showDialog()
+            }
             shakeFlag = true
         }
 
@@ -136,6 +158,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         // detect pull ups if in pull up mode
         addToWindow(meanWindow, mean)
         if (pullUpStarted && initFlag) {
+            //tv_mode.text = modes[0]
+            //btnStop.visibility = View.VISIBLE;
             //Log.d("sensor", "pull up detected")
             Log.d("sensor", "mean of sliding window = $mean")
             if (meanWindow[0] > 11) {
@@ -145,7 +169,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                         pullUpCounter += 1
                         tv_numPullUps.text = pullUpCounter.toString()
                         Log.d("sensor", "PULL UP POS = UP")
-                        if (pullUpCounter == goalPullUps.toInt()){
+                        //check if user met goal if in goal mode
+                        if (pullUpMode == modes[1] && pullUpCounter == goalPullUps.toInt()){
                             playSound()
                             tv_mode.text = "CONGRATS!\nYOU MET YOUR GOAL!\n\nYou can continue to do more pull ups if you'd like."
                         }
@@ -257,6 +282,18 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         mSensorManager.unregisterListener(this)
     }
 
+    private fun stopPullUps(){
+        val btnStop = findViewById<Button>(R.id.b_stop)
+        shakeFlag = false
+        pullUpStarted = false
+        pullUpStopped = true
+        pullUpPosUp = false
+        initFlag = false
+        tv_mode.text = "Shake again to continue pull ups!"
+        btnStop.visibility = View.INVISIBLE
+
+    }
+
     private fun showDialog() {
         val taskEditText = EditText(this)
         taskEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -286,6 +323,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             tv_mode.text = modes[1] + "\nNumber of Pull Ups: $goalPullUps"
             Toast.makeText(applicationContext,"Counter started in goal mode!",Toast.LENGTH_SHORT).show()
             pullUpStarted = true
+            btnStop.visibility = View.VISIBLE
         }
 
 
@@ -295,6 +333,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             tv_mode.text = modes[0]
             Toast.makeText(applicationContext,"Counter started in free mode!",Toast.LENGTH_SHORT).show()
             pullUpStarted = true
+            btnStop.visibility = View.VISIBLE
         }
 
 
