@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         // Remove the gravity contribution with the high-pass filter.
         linear_acceleration[0] = event.values[0] - alpha // X
         linear_acceleration[1] = event.values[1] - alpha // Y
-        linear_acceleration[2] = event.values[2] - alpha // Z
+        linear_acceleration[2] = (event.values[2] - alpha) * 100 // Z
 
         //save data into an array to make inference about the gesture
         //pay attention to the units
