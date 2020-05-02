@@ -61,7 +61,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         }
     }
 
-
     //  ``````````` TO DO ````````````````````````
     //1. Capture samples for some time and fill an array with the values
     //2. Stop capturing data when we have enough samples (unregister the listener)
