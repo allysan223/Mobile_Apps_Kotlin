@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 
    // ********** TO DO ************
     const val MODEL_FILE = "allysaNguyen_quantized.tflite"
-    const val OUTPUT_CLASSES_COUNT = 2 //total number of outputs classes. "wing" or "unkown"
+    const val OUTPUT_CLASSES_COUNT = 2 //total number of outputs classes. "wing" or "unknown"
     const val MAX_SAMPLES = 128
 // ******************************
 
@@ -71,12 +71,15 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             return
         // Isolate the force of gravity with the low-pass filter.
         val alpha: Float = 0.8f
+        gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0]
+        gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1]
+        gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2]
 
         //1. Capture samples for some time and fill an array with the values
         // Remove the gravity contribution with the high-pass filter.
-        linear_acceleration[0] = event.values[0] - alpha // X
-        linear_acceleration[1] = event.values[1] - alpha // Y
-        linear_acceleration[2] = (event.values[2] - alpha) * 100 // Z
+        linear_acceleration[0] = (event.values[0] - gravity[0])  // X
+        linear_acceleration[1] = (event.values[1] - gravity[1])  // Y
+        linear_acceleration[2] = (event.values[2] - gravity[2]) * 100// Z
 
         //save data into an array to make inference about the gesture
         //pay attention to the units
