@@ -6,8 +6,11 @@ import android.app.AlertDialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGattCharacteristic
+import android.content.ActivityNotFoundException
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.InputType
@@ -21,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 
 const val DEVICE_NAME = "circuit_playground"
+const val EMERGENCY_CONTACT = "5099428579"
 
 class MainActivity : AppCompatActivity(), BLEControl.Callback {
 
@@ -33,6 +37,8 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
     // Alarm
     var alarmDuration: Long = 10*1000 //in milliseconds
     var seconds: Long = 0
+
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -242,19 +248,68 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
                 }
 
                 override fun onFinish() {
+                    // remove dialog
+                    dialog.dismiss()
+
                     //timer is done
                     //TODO: blink neopixel red and play noise
 
                     //make phone call
-                    //makePhoneCall()
-
-                    // remove dialog
-                    dialog.dismiss()
-
+                    makePhoneCall()
                 }
             }.start()
         }
     }
+
+    fun makePhoneCall() {
+        Log.d("TAG", "entered makePhoneCall")
+        try {
+            val uri: String = "tel:" + EMERGENCY_CONTACT
+            val intent = Intent(Intent.ACTION_CALL, Uri.parse(uri))
+            if (ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.CALL_PHONE)) {
+                    // Show an explanation to the user *asynchronously* -- don't block
+                    // this thread waiting for the user's response! After the user
+                    // sees the explanation, try again to request the permission.
+                } else {
+                    // No explanation needed, we can request the permission.
+                    ActivityCompat.requestPermissions(this,
+                        arrayOf(Manifest.permission.CALL_PHONE),
+                        42)
+                }
+
+                // here to request the missing permissions, and then overriding
+                // public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                // int[] grantResults)
+                // to handle the case where the user grants the permission.
+                return
+            }
+            startActivity(intent)
+            Log.d("TAG", "making phone call")
+        } catch (e: ActivityNotFoundException) {
+            Log.d("TAG", "error in making call: $e")
+        }
+
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        if (requestCode == 42) {
+            // If request is cancelled, the result arrays are empty.
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                // permission was granted, yay!
+                makePhoneCall()
+            } else {
+                // permission denied, boo! Disable the
+                // functionality
+            }
+            return
+        }
+    }
+
 
 
     companion object {
