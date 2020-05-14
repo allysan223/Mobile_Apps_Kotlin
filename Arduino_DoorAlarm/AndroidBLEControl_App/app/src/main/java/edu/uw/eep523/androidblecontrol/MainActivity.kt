@@ -2,15 +2,21 @@ package edu.uw.eep523.androidblecontrol
 
 
 import android.Manifest
+import android.app.AlertDialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGattCharacteristic
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.text.InputType
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
+import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 
@@ -23,6 +29,10 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
     private var ble: BLEControl? = null
     private var messages: TextView? = null
     private var rssiAverage:Double = 0.0
+
+    // Alarm
+    var alarmDuration: Long = 10*1000 //in milliseconds
+    var seconds: Long = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,7 +61,9 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
                 arrayOf( Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 1)
 
 
+
     }
+
     //Function that reads the RSSI value associated with the bluetooth connection between the phone and the Arudino board
     //If you use the RSSI to calculate distance, you may want to record a set of values over a period of time
     //and obtain the average
@@ -65,7 +77,8 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
 
     fun clearText (v:View){
         messages!!.text=""
-
+        showDialog()
+        Log.d("TAG", "text cleared")
     }
 
     override fun onResume() {
@@ -168,6 +181,81 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
         writeLine("Received value: " + rx.getStringValue(0))
 
     }
+    /**
+     * set up dialog box
+     * @param
+     */
+    private fun showDialog() {
+        runOnUiThread {
+            Log.d("TAG", "entered showDialog()")
+//        val taskEditText = EditText(this)
+//        taskEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+//        taskEditText.hint = "hint for edit text"
+
+            // Initialize a new instance of
+            val builder = AlertDialog.Builder(this@MainActivity)
+
+            // Set the alert dialog title
+            builder.setTitle("Arduino Alarmed!")
+
+            // Display a message on alert dialog
+            builder.setMessage("Do you want to cancel the alarm?")
+
+            // Display an edit text field
+//        builder.setView(taskEditText)
+
+            // Set a positive button and its click listener on alert dialog
+//            builder.setPositiveButton("Yes") { dialog, which -> //goalPullUps = taskEditText.text.toString()
+//                // Do something when user press the positive button
+//
+//            }
+
+
+            // Display a negative button on alert dialog
+            builder.setNegativeButton("Cancel Alarm") { dialog, which ->
+                // Do something when user press the cancel button
+                // TODO: Light neopixels green
+                // TODO: go back to monitoring arduino sensors
+            }
+
+
+            // Display a neutral button on alert dialog
+//        builder.setNeutralButton("Cancel"){_,_ ->
+//            //Do something when user pressed neutral button
+//        }
+
+            // Finally, make the alert dialog using builder
+            val dialog: AlertDialog = builder.create()
+
+            // Displaying the alert dialog on app interface
+            dialog.show()
+            //dialog.dismiss()
+
+            Log.d("tag", "starting timer for alarm")
+
+            object : CountDownTimer(alarmDuration, 1000) {
+                // perform this every 'tick' (countDownInterval)
+                override fun onTick(millisUntilFinished: Long) {
+                    seconds = millisUntilFinished / 1000
+                    Log.d("tag", "seconds remaining: " + seconds)
+                    dialog.setMessage("Do you want to cancel the alarm?\n$seconds seconds remaining.")
+                }
+
+                override fun onFinish() {
+                    //timer is done
+                    //TODO: blink neopixel red and play noise
+
+                    //make phone call
+                    //makePhoneCall()
+
+                    // remove dialog
+                    dialog.dismiss()
+
+                }
+            }.start()
+        }
+    }
+
 
     companion object {
         private val REQUEST_ENABLE_BT = 0
