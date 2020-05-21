@@ -186,6 +186,8 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
     override fun onReceive(ble: BLEControl, rx: BluetoothGattCharacteristic) {
         writeLine("Received value: " + rx.getStringValue(0))
 
+        //TODO: Check for received notification, if so call showDialog()
+
     }
     /**
      * set up dialog box
@@ -197,6 +199,7 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
 //        val taskEditText = EditText(this)
 //        taskEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
 //        taskEditText.hint = "hint for edit text"
+            var alarmCancelled = false
 
             // Initialize a new instance of
             val builder = AlertDialog.Builder(this@MainActivity)
@@ -219,6 +222,7 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
 
             // Display a negative button on alert dialog
             builder.setNegativeButton("Cancel Alarm") { dialog, which ->
+                alarmCancelled = true
                 // Do something when user press the cancel button
                 // TODO: Light neopixels green
                 // TODO: go back to monitoring arduino sensors
@@ -242,6 +246,8 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
             object : CountDownTimer(alarmDuration, 1000) {
                 // perform this every 'tick' (countDownInterval)
                 override fun onTick(millisUntilFinished: Long) {
+                    if (alarmCancelled)
+                        cancel()
                     seconds = millisUntilFinished / 1000
                     Log.d("tag", "seconds remaining: " + seconds)
                     dialog.setMessage("Do you want to cancel the alarm?\n$seconds seconds remaining.")
