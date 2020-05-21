@@ -16,6 +16,7 @@
   #include <SoftwareSerial.h>
 #endif
 
+#define ARRAY_SIZE 5
 
 // Strings to compare incoming BLE messages
 String start = "start";
@@ -24,6 +25,13 @@ String readtemp = "readtemp";
 String stp = "stop";
 
 int  sensorTemp = 0;
+float sensorX = 0;
+float sensorY = 0;
+float sensorZ = 0;
+float valuesZ[] = {0,0,0,0,0};
+
+bool alarmMode = false;
+bool blinkToggle = true;
 
 /*=========================================================================
     APPLICATION SETTINGS
@@ -110,9 +118,13 @@ Serial.println("CONECTED:");
   Serial.println( F("Switching to DATA mode!") );
   ble.setMode(BLUEFRUIT_MODE_DATA);
 
+  //set lights to green
+  for(int i = 0; i < 11; i++){
+    CircuitPlayground.setPixelColor(i,0,204,0);
+  }
+    delay(50);
+
   Serial.println(F("******************************"));
- 
-  CircuitPlayground.setPixelColor(20,20,20,20);
  
   delay(1000);
 }
@@ -133,7 +145,37 @@ void loop(void)
         delay(50);
   }
 
-  if(red == received){
+//reading accelerometer sensor
+  sensorX = CircuitPlayground.motionX();
+  sensorY = CircuitPlayground.motionY();
+  sensorZ = CircuitPlayground.motionZ();
+
+  Serial.println((String)"Accel: " + sensorX + ", " + sensorY + ", " + sensorZ);
+
+//keep running window of Z values from accelerometer
+  for (int idx = ARRAY_SIZE-1; idx > 0; idx--){
+    valuesZ[idx-1] = valuesZ[idx];
+  }
+  valuesZ[ARRAY_SIZE-1] = sensorZ;
+  delay(100);
+  
+//check if motion has occured and send message to andriod
+  if (valuesZ[0] != 0 && abs(valuesZ[ARRAY_SIZE-1] - valuesZ[0]) > 1){
+    Serial.println("DOOR OPENED");
+    alarmMode = true;
+    //Send data to Android Device
+    char output[8];
+    String data = "alarm";
+    data.toCharArray(output,8);
+    ble.print(data); 
+  }
+
+  if(alarmMode){
+    blinkOrange(blinkToggle);
+    blinkToggle = !blinkToggle;
+  }
+
+  if(received == red){
     Serial.println("RECEIVED RED!!!!"); 
        for(int i = 0; i < 11; i++){
       CircuitPlayground.setPixelColor(i,221, 44, 44);
@@ -141,7 +183,7 @@ void loop(void)
     delay(50);
   }
  
-  else if(readtemp == received){
+  else if(received == readtemp){
        
     sensorTemp = CircuitPlayground.temperature(); // returns a floating point number in Centigrade
     Serial.println("Read temperature sensor"); 
@@ -156,11 +198,24 @@ void loop(void)
     ble.print(data);
   }
  
-  else if (stp == received){
+  else if (received == stp){
       CircuitPlayground.clearPixels();
+      Serial.println("cleared");
 
     }
     
+  }
+
+  void blinkOrange(bool toggle){
+      for(int i = 0; i < 11; i++){
+        if (toggle){
+          CircuitPlayground.setPixelColor(i, 255, 128, 0);
+        } else {
+          CircuitPlayground.clearPixels();
+          //CircuitPlayground.setPixelColor(i, 255, 255, 255);
+        }
+      }
+      delay(100);
   }
 
  

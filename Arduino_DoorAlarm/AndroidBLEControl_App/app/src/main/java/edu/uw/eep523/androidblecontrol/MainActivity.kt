@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
 
     fun clearText (v:View){
         messages!!.text=""
-        showDialog()
+        //showDialog()
         Log.d("TAG", "text cleared")
     }
 
