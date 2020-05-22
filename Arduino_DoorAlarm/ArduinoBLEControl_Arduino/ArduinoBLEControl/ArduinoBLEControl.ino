@@ -18,6 +18,10 @@
 
 #define ARRAY_SIZE 5
 
+const int speaker = 5;       // The CP microcontroller pin for the speaker
+const int leftButton = 4;    // The CP microcontroller pin for the left button
+const int rightButton = 19;  // The CP microcontroller pin for the right button
+
 // Strings to compare incoming BLE messages
 String start = "start";
 String red = "red";
@@ -35,6 +39,8 @@ long previousTime;
 bool alarmMode = false;
 bool alarmTriggered = false;
 bool blinkToggle = true;
+bool btnRightPressed = false;
+bool btnLeftPressed = false;
 
 /*=========================================================================
     APPLICATION SETTINGS
@@ -67,6 +73,9 @@ void error(const __FlashStringHelper*err) {
 void setup(void)
 {
   CircuitPlayground.begin();
+  pinMode(speaker, OUTPUT);     // write out to the speaker
+  pinMode(leftButton, INPUT);   // read in from the buttons
+  pinMode(rightButton,INPUT);
   
 
   Serial.begin(115200);
@@ -143,7 +152,7 @@ void loop(void)
     for(int i = 0; i < 11; i++){
       CircuitPlayground.setPixelColor(i,221, 44, 44);
     }
-    delay(500);
+    makeTone(speaker,440,1000);
     CircuitPlayground.clearPixels();
     delay(500);
   }
@@ -172,7 +181,7 @@ void loop(void)
   valuesZ[ARRAY_SIZE-1] = sensorZ;
   delay(100);
   
-//check if motion has occured and send message to andriod
+//check if motion has occured and send message to andriod by checking the difference between first and last value
   if (valuesZ[0] != 0 && abs(valuesZ[ARRAY_SIZE-1] - valuesZ[0]) > 1){
     Serial.println("DOOR OPENED");
     alarmMode = true;
@@ -186,6 +195,23 @@ void loop(void)
   if(alarmMode){
     blinkOrange(blinkToggle);
     blinkToggle = !blinkToggle;
+    if (CircuitPlayground.rightButton()){
+      btnRightPressed = true;
+    }
+    if (CircuitPlayground.leftButton()){
+      btnLeftPressed = true;
+    }
+
+    if (btnRightPressed){
+      if (btnLeftPressed){
+        resetAlarm();
+        //Send data to Android Device
+        char output[8];
+        String data = "reset";
+        data.toCharArray(output,8);
+        ble.print(data);
+      }
+    }
   }
 
   if(received == red){
@@ -197,12 +223,15 @@ void loop(void)
   }
 
   else if (received == "reset"){
-    alarmMode = false;
-    Serial.println("RESET ALARM");
-    //set lights back to green
-    for(int i = 0; i < 11; i++){
-    CircuitPlayground.setPixelColor(i,0,204,0);
-    }
+    resetAlarm();
+//    alarmMode = false;
+//    btnLeftPressed = false;
+//    btnRightPressed = false;
+//    Serial.println("RESET ALARM");
+//    //set lights back to green
+//    for(int i = 0; i < 11; i++){
+//    CircuitPlayground.setPixelColor(i,0,204,0);
+//    }
   }
 
   else if (received == "ALARM"){
@@ -235,6 +264,9 @@ void loop(void)
 
   void resetAlarm(){
     alarmMode = false;
+    btnLeftPressed = false;
+    btnRightPressed = false;
+    Serial.println("RESET ALARM");
     //set lights to green
     for(int i = 0; i < 11; i++){
       CircuitPlayground.setPixelColor(i,0,204,0);
@@ -254,5 +286,17 @@ void loop(void)
       }
       delay(100);
   }
+
+  void makeTone (unsigned char speakerPin, int frequencyInHertz, long timeInMilliseconds) {
+  int x;   
+  long delayAmount = (long)(1000000/frequencyInHertz);
+  long loopTime = (long)((timeInMilliseconds*1000)/(delayAmount*2));
+  for (x=0; x<loopTime; x++) {        // the wave will be symetrical (same time high & low)
+     digitalWrite(speakerPin,HIGH);   // Set the pin high
+     delayMicroseconds(delayAmount);  // and make the tall part of the wave
+     digitalWrite(speakerPin,LOW);    // switch the pin back to low
+     delayMicroseconds(delayAmount);  // and make the bottom part of the wave
+  }  
+}
 
  
