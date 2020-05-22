@@ -30,7 +30,10 @@ float sensorY = 0;
 float sensorZ = 0;
 float valuesZ[] = {0,0,0,0,0};
 
+long previousTime;
+
 bool alarmMode = false;
+bool alarmTriggered = false;
 bool blinkToggle = true;
 
 /*=========================================================================
@@ -135,6 +138,16 @@ Serial.println("CONECTED:");
 /**************************************************************************/
 void loop(void)
 {
+
+  while (alarmTriggered){
+    for(int i = 0; i < 11; i++){
+      CircuitPlayground.setPixelColor(i,221, 44, 44);
+    }
+    delay(500);
+    CircuitPlayground.clearPixels();
+    delay(500);
+  }
+  
   // Save received data to string
   String received = "";
   while ( ble.available() )
@@ -169,7 +182,7 @@ void loop(void)
     data.toCharArray(output,8);
     ble.print(data); 
   }
-
+//alarm has been triggered
   if(alarmMode){
     blinkOrange(blinkToggle);
     blinkToggle = !blinkToggle;
@@ -177,10 +190,24 @@ void loop(void)
 
   if(received == red){
     Serial.println("RECEIVED RED!!!!"); 
-       for(int i = 0; i < 11; i++){
+    for(int i = 0; i < 11; i++){
       CircuitPlayground.setPixelColor(i,221, 44, 44);
     }
     delay(50);
+  }
+
+  else if (received == "reset"){
+    alarmMode = false;
+    Serial.println("RESET ALARM");
+    //set lights back to green
+    for(int i = 0; i < 11; i++){
+    CircuitPlayground.setPixelColor(i,0,204,0);
+    }
+  }
+
+  else if (received == "ALARM"){
+    Serial.println("TRIGGER ALARM - INTRUDER");
+    alarmTriggered = true;
   }
  
   else if(received == readtemp){
@@ -203,6 +230,16 @@ void loop(void)
       Serial.println("cleared");
 
     }
+    
+  }
+
+  void resetAlarm(){
+    alarmMode = false;
+    //set lights to green
+    for(int i = 0; i < 11; i++){
+      CircuitPlayground.setPixelColor(i,0,204,0);
+    }
+    delay(50);
     
   }
 

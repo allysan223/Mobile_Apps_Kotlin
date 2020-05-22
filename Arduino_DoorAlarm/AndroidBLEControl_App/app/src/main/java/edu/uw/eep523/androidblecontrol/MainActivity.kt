@@ -37,6 +37,8 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
     // Alarm
     var alarmDuration: Long = 10*1000 //in milliseconds
     var seconds: Long = 0
+    var alarmTriggered = false
+
 
 
 
@@ -187,6 +189,12 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
         writeLine("Received value: " + rx.getStringValue(0))
 
         //TODO: Check for received notification, if so call showDialog()
+        if (rx.getStringValue(0) == "alarm"){
+            if (!alarmTriggered){
+                showDialog()
+                alarmTriggered = true
+            }
+        }
 
     }
     /**
@@ -196,9 +204,7 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
     private fun showDialog() {
         runOnUiThread {
             Log.d("TAG", "entered showDialog()")
-//        val taskEditText = EditText(this)
-//        taskEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
-//        taskEditText.hint = "hint for edit text"
+
             var alarmCancelled = false
 
             // Initialize a new instance of
@@ -223,9 +229,11 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
             // Display a negative button on alert dialog
             builder.setNegativeButton("Cancel Alarm") { dialog, which ->
                 alarmCancelled = true
+                alarmTriggered = false
                 // Do something when user press the cancel button
-                // TODO: Light neopixels green
-                // TODO: go back to monitoring arduino sensors
+                // Light neopixels green
+                // go back to monitoring arduino sensors
+                ble!!.send("reset")
             }
 
 
@@ -253,15 +261,21 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
                     dialog.setMessage("Do you want to cancel the alarm?\n$seconds seconds remaining.")
                 }
 
+                //timer has elapsed - make a phone call and alert arduino
                 override fun onFinish() {
                     // remove dialog
                     dialog.dismiss()
 
-                    //timer is done
+                    //timer is done - ALARM Arduino
                     //TODO: blink neopixel red and play noise
+                    ble!!.send("ALARM")
+
 
                     //make phone call
                     makePhoneCall()
+
+                    //reset alarm
+                    alarmTriggered = false
                 }
             }.start()
         }
