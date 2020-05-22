@@ -7,19 +7,15 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.ActivityNotFoundException
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.text.InputType
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
-import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 
@@ -38,6 +34,10 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
     var alarmDuration: Long = 10*1000 //in milliseconds
     var seconds: Long = 0
     var alarmTriggered = false
+    var alarmCancelled = false
+
+    var timer: CountDownTimer? = null
+    var dialog: AlertDialog? = null
 
 
 
@@ -190,10 +190,20 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
 
         //TODO: Check for received notification, if so call showDialog()
         if (rx.getStringValue(0) == "alarm"){
+            Log.d("TAG", "message received: alarm")
             if (!alarmTriggered){
                 showDialog()
                 alarmTriggered = true
             }
+        }
+
+        if (rx.getStringValue(0) == "reset"){
+            Log.d("TAG", "message received: reset")
+            alarmTriggered = false
+            timer?.cancel()
+            dialog!!.dismiss()
+            alarmCancelled = true
+
         }
 
     }
@@ -205,10 +215,10 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
         runOnUiThread {
             Log.d("TAG", "entered showDialog()")
 
-            var alarmCancelled = false
+            alarmCancelled = false
 
             // Initialize a new instance of
-            val builder = AlertDialog.Builder(this@MainActivity)
+            var builder = AlertDialog.Builder(this@MainActivity)
 
             // Set the alert dialog title
             builder.setTitle("Arduino Alarmed!")
@@ -243,28 +253,30 @@ class MainActivity : AppCompatActivity(), BLEControl.Callback {
 //        }
 
             // Finally, make the alert dialog using builder
-            val dialog: AlertDialog = builder.create()
+            dialog = builder.create()
 
             // Displaying the alert dialog on app interface
-            dialog.show()
+            dialog!!.show()
             //dialog.dismiss()
 
             Log.d("tag", "starting timer for alarm")
 
-            object : CountDownTimer(alarmDuration, 1000) {
+            timer = object : CountDownTimer(alarmDuration, 1000) {
                 // perform this every 'tick' (countDownInterval)
                 override fun onTick(millisUntilFinished: Long) {
-                    if (alarmCancelled)
+                    if (alarmCancelled) {
+                        dialog!!.dismiss()
                         cancel()
+                    }
                     seconds = millisUntilFinished / 1000
                     Log.d("tag", "seconds remaining: " + seconds)
-                    dialog.setMessage("Do you want to cancel the alarm?\n$seconds seconds remaining.")
+                    dialog!!.setMessage("Do you want to cancel the alarm?\n$seconds seconds remaining.")
                 }
 
                 //timer has elapsed - make a phone call and alert arduino
                 override fun onFinish() {
                     // remove dialog
-                    dialog.dismiss()
+                    dialog!!.dismiss()
 
                     //timer is done - ALARM Arduino
                     //TODO: blink neopixel red and play noise
